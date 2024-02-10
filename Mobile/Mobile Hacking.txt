@@ -1,0 +1,117 @@
+Mobile concepts
+========================
+
+## Xamarin References
+
+https://thomasbandt.com/certificate-and-public-key-pinning-with-xamarin
+https://docs.microsoft.com/en-us/xamarin/cross-platform/app-fundamentals/transport-layer-security?tabs=windows
+https://stackoverflow.com/questions/28629989/ignore-ssl-certificate-errors-in-xamarin-forms-pcl
+https://opdhsblobprod03.blob.core.windows.net/contents/332e36c8b2484d748610a3dd6b6e98d6/da4852aff582bfb55e9cf6665b685718?sv=2018-03-28&sr=b&si=ReadPolicy&sig=3HgVvBTUZaGPMMfD88onE%2BwG8R6Kfe0CcYBGBJ3z%2FH4%3D&st=2020-05-12T23%3A13%3A29Z&se=2020-05-13T23%3A23%3A29Z
+https://stackoverflow.com/questions/54069581/how-to-resolve-javax-net-ssl-sslhandshakeexception-in-xamarin-forms
+https://stackoverflow.com/questions/12506575/how-to-ignore-the-certificate-check-when-ssl
+https://www.c-sharpcorner.com/article/certificate-pinning-in-xamarin-forms/
+https://github.com/GoSecure/frida-xamarin-unpin
+https://docs.microsoft.com/en-us/dotnet/api/system.net.servicepointmanager.servercertificatevalidationcallback?view=netcore-3.1
+https://docs.microsoft.com/en-us/xamarin/cross-platform/troubleshooting/questions/version-logs
+https://www.gosecure.net/blog/2020/04/06/bypassing-xamarin-certificate-pinning-on-android/
+https://medium.com/@everth/reverseando-un-app-con-xamarin-con-android-modificando-las-dlls-f7a417ab7741
+
+
+https://report.ostorlab.co/public/scan/36523
+https://drive.google.com/drive/u/0/folders/1rE6r67r1vsDrVxvAd5StXWSNGgsMpH5r?sort=13&direction=a
+
+## Content Provider
+
+source:
+
+https://developer.android.com/guide/topics/providers/content-provider-basics
+
+
+Many of the applications use content providers to store and query data within the application or the data from the phone. Content shared to or by other applications.
+
+Each content provider have an URI associated like the image below:
+
+with drozer:
+
+	run appprovider.finduri <package_name>
+	
+![qownnotes-media-ZBzVqN](file://media/14299.png)
+
+
+![qownnotes-media-OPvdLA](file://media/5419.png)
+
+
+## Intercepting HTTPS
+
+First of all, install burp suite certificate in the phone or the VM:
+
+visit the IP address of the burpsuite proxy, as an example:
+
+	http://192.168.1.254:8080/cert
+
+	
+This will download the certificate, than install in the phone. But you can push the certificate file to the phone.
+
+1) Download the file:
+
+![qownnotes-media-OoENdg](file://media/2106.png)
+
+
+with adb (Insert adb.exe file to the PATH variable:)
+![qownnotes-media-LUyeSV](file://media/1786.png)
+
+![qownnotes-media-wdVrYS](file://media/2405.png)
+
+## Interacting with mobile (Frida)
+
+### view all applications installed in the phone
+
+	frida-ps -ia -H 192.168.1.28
+
+or
+
+	adb shell pm list packages -f
+	
+
+## Debugging an apk
+
+sources: https://blog.netspi.com/attacking-android-applications-with-debuggers/#7
+https://www.youtube.com/watch?v=jdxFfG8gICw&t=1140s
+
+https://guides.codepath.com/android/Debugging-Exceptions-within-your-App
+
+1.  first of all, we have to make the apk debuggable. We can get this done with the followinf steps:
+	1. Decompile the application with apktool as described in <note://Reverse-engeneering#Decompiling-android-APK>
+	2. Change the AndroidManifest.xml file inside the output folder... Isinden the \<application\> tag, insert the value [android:debuggable="true"]
+
+2. start the process in Wait for Debugger mode:
+
+		adb am start -D -n nome.of.package/package.ClassName
+	
+where "package.ClassName" is the starting class of the application. You can find the starting class in the AndroidManifest.xml file in the tag \<action\> with \<category\> is configured as "LAUNCHER". As an example:
+
+![qownnotes-media-xfMuSP](file://media/8813.png)
+
+
+		adb am start -D -n br.com.amil.beneficiarios/android.intent.action.MAIN
+
+ 3. search for a process with hte name of the package. Java debugger (jdb that comes with jdk package of java) and forward the debug process to a tcp port:
+ 
+	adb shell ps | select-string "amil"
+ 
+ or
+ 
+	adb shell ps | grep "amil"
+	
+	adb forward tcp:4321 jdwp:<PID>
+	
+![qownnotes-media-jJLrTZ](file://media/13067.png)
+
+	jdb -connect com.sun.jdi.SocketAttach:hostname=localhost,port=4321
+
+Daí pra frente amigão... vai ter que se virar meu velho! Porque eu não cheguei a pesquisar tudo não!
+
+
+ 	
+ 	 
+	

@@ -2,6 +2,7 @@ Resumo AD Hacking
 ========================
 
 Muitas coisas foram colocadas em prática na máquina [Forest](InfraHacking%2FCTFs%2FHackTheBox%2FForest.md#Adicionais)
+
 [Active](InfraHacking%2FCTFs%2FHackTheBox%2FActive.md)
 
 # Enumeration no creds
