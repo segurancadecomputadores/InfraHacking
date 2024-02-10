@@ -21,11 +21,11 @@ http://davenport.sourceforge.net/ntlm.html
 
     hashid c43ee559d69bc7f691fe2fbfe8a5ef0a
 
-![qownnotes-media-iGYHcO](../media/qownnotes-media-iGYHcO.png)
+![qownnotes-media-iGYHcO](../../media/qownnotes-media-iGYHcO.png)
 
     hashid '$6$l5bL6XIASslBwwUD$bCxeTlbhTH76wE.bI66aMYSeDXKQ8s7JNFwa1s1KkTand6ZsqQKAF3G0tHD9bd59e5NAz/s7DQcAojRTWNpZX0'
 
-![qownnotes-media-gbTqVR](../media/qownnotes-media-gbTqVR.png)
+![qownnotes-media-gbTqVR](../../media/qownnotes-media-gbTqVR.png)
 
 Importantíssimo aprendizado:
 
@@ -36,7 +36,7 @@ Importantíssimo aprendizado:
 
     john --format=sha256crypt -w /usr/share/wordlists/rockyou.txt shadow
 
-![qownnotes-media-rlUmkO](../media/qownnotes-media-rlUmkO.png)
+![qownnotes-media-rlUmkO](../../media/qownnotes-media-rlUmkO.png)
 
 
 ### LM
