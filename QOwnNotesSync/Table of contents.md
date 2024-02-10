@@ -1,7 +1,7 @@
 # Table of contents
 
 * [Enumeration Resumo](README.md)
-* [Windows Privilege Escalation ](windows-privilege-escalation.md)
+* [Windows Privilege Escalation ](..%2F5_Privilege_Escalation%2Fwindows-privilege-escalation.md)
 * [Linux Privilege Escalation](linux-privilege-escalation.md)
 * [Active Directory](active-directory/README.md)
   * [Kerberoasting](active-directory/kerberoasting.md)
