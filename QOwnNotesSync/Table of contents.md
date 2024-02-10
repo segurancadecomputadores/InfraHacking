@@ -1,9 +1,9 @@
 # Table of contents
 
-* [Enumeration Resumo](README.md)
-* [Windows Privilege Escalation ](..%2F5_Privilege_Escalation%2Fwindows-privilege-escalation.md)
+* [Enumeration Resumo](./)
+* [Windows Privilege Escalation](../5\_Privilege\_Escalation/windows-privilege-escalation.md)
 * [Linux Privilege Escalation](linux-privilege-escalation.md)
-* [Active Directory](active-directory/README.md)
+* [Active Directory](active-directory/)
   * [Kerberoasting](active-directory/kerberoasting.md)
   * [Silver Ticket](active-directory/silver-ticket.md)
   * [AD Exploitation](active-directory/ad-exploitation.md)

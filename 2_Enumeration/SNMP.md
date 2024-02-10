@@ -2,10 +2,14 @@
 Title: Hacking>SNMP
 Contents: SNMP
 tag: Hacking>SNMP
-...
 ---
-SNMP
-========================
+
+# SNMP
+
+***
+
+## SNMP
+
 snmp enumeration
 
 ```
@@ -30,57 +34,72 @@ Module options (auxiliary/scanner/snmp/snmp_enum):
 
 ```
 
-![qownnotes-media-ZsRaRI](../../media/qownnotes-media-ZsRaRI.png)
+<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+
+Considerar
+
+### SNMPWALK
+
+```
+snmpwalk -c public -v1 -t 10 10.11.1.14
+```
+
+**Windows users**
+
+```
+snmpwalk -c public -v1 10.11.1.14 1.3.6.1.4.1.77.1.2.25
+```
+
+**Windows processes**
+
+```
+snmpwalk -c public -v1 10.11.1.73 1.3.6.1.2.1.25.4.2.1.2
+```
+
+**Windows TCP open ports**
+
+```
+snmpwalk -c public -v1 10.11.1.14 1.3.6.1.2.1.6.13.1.3    
+```
+
+**Windows installed software:**
+
+```
+snmpwalk -c public -v1 10.11.1.50 1.3.6.1.2.1.25.6.3.1.2
+```
+
+### onesixtyone
+
+```
+echo public > community
+echo private >> community
+echo manager >> community
+for ip in $(seq 1 254); do echo 10.11.1.$ip; done > ips
+onesixtyone -c community -i ips
 
 
-Considerar 
+onesixtyone 192.168.4.0/24 public
 
-## SNMPWALK
+onesixtyone -c dict.txt -i hosts -o my.log -w 100
+```
 
-    snmpwalk -c public -v1 -t 10 10.11.1.14
-    
-#### Windows users
-    
-    snmpwalk -c public -v1 10.11.1.14 1.3.6.1.4.1.77.1.2.25
-    
-#### Windows processes
+### SNMPCHECK
 
-    snmpwalk -c public -v1 10.11.1.73 1.3.6.1.2.1.25.4.2.1.2
+```
+snmp-check -w -c public <hostname>
+```
 
-#### Windows TCP open ports
-    
-    snmpwalk -c public -v1 10.11.1.14 1.3.6.1.2.1.6.13.1.3    
+### snmpbulkwalk
 
-#### Windows installed software:
+```
+sudo apt update
+sudo apt install snmp-mibs-downloader
 
-    snmpwalk -c public -v1 10.11.1.50 1.3.6.1.2.1.25.6.3.1.2
+snmpbulkwalk -c public -v2c <hostname> | tee snmpbulk.txt
+python snmp_process_list.py snmpbulk.txt
+```
 
-## onesixtyone
-
-    echo public > community
-    echo private >> community
-    echo manager >> community
-    for ip in $(seq 1 254); do echo 10.11.1.$ip; done > ips
-    onesixtyone -c community -i ips
-
-
-    onesixtyone 192.168.4.0/24 public
-    
-    onesixtyone -c dict.txt -i hosts -o my.log -w 100
-    
-## SNMPCHECK
-
-    snmp-check -w -c public <hostname>
-
-## snmpbulkwalk
-
-    sudo apt update
-    sudo apt install snmp-mibs-downloader
-    
-    snmpbulkwalk -c public -v2c <hostname> | tee snmpbulk.txt
-    python snmp_process_list.py snmpbulk.txt
-    
-### snmp_process_list.py
+#### snmp\_process\_list.py
 
 ```
 #!/usr/bin/env python3

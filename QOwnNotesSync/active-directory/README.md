@@ -55,7 +55,7 @@ crackmapexec smb <hostname>
 
 ### 3 - Obtém serviços
 
-basic nmap TCP [nmap\_enum](https://app.gitbook.com/o/2Zy5rWlDaAhU300B2fZ9/s/G7hJBZ74BeKBgUnukZ44/scripts/nmap\_enum)
+basic nmap TCP [nmap\_enum](https://app.gitbook.com/s/G7hJBZ74BeKBgUnukZ44/scripts/nmap\_enum)
 
 ```
 sudo nmap_enum <hostname> | tee nmap_output.txt
@@ -246,6 +246,6 @@ crackmapexec winrm hosts.txt -u users.txt -p passwords_test.txt --continue
 
 ###
 
-Depois disso precisamos enumerar o domínio. Aqui temos duas possibilidades, sendo elas com&#x20;
+Depois disso precisamos enumerar o domínio. Aqui temos duas possibilidades, sendo elas com
 
 ####
