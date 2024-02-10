@@ -125,7 +125,7 @@ netsh é uma utilidade que deve ser utilizada com privilégios elevados. Para o 
 
     services
 
-![b47f02d3bb0d8d154a6027a84543ce8c-port_redirection_and_tunneling_03](../media/b47f02d3bb0d8d154a6027a84543ce8c-port_redirection_and_tunneling_03.png)
+![b47f02d3bb0d8d154a6027a84543ce8c-port_redirection_and_tunneling_03](../../media/b47f02d3bb0d8d154a6027a84543ce8c-port_redirection_and_tunneling_03.png)
 
 ### local port forwarding
 
