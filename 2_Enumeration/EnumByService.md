@@ -2,54 +2,9 @@ EnumByService
 ========================
 
 
-
-Verbose
-
-    	nmap -v --script all hosts
-
-Para mais detalhes em outros tipos de scan com nmap pode verificar [esta nota](..%2FTools%2FNmap.md)
-
-## netcat
-
-    nc -z -w 1 -n -v 10.11.1.70 500
-    nc -z -w 1 -n -v 10.11.1.70 500-1000
-
-    nc -u -z -w 1 -n -v 10.11.1.70 161
-
-## bash pseudo devices
-
-
-    /dev/$protocol/$host/$port
-
-    if timeout 5 bash -c '</dev/tcp/kernel.org/443 &>/dev/null'
-    then
-      echo "Port is open"
-    else
-      echo "Port is closed"
-    fi
-
-ou
-
-    timeout .1 bash -c "echo /dev/tcp/10.11.1.5/80" && echo "port 80 is open"
-
-
-## Legion
-
-    sudo legion
 	
 
-![qownnotes-media-ZtomcZ](file://media/1239443923.png)
 
-
-## metasploit
-
-no metasploit podemos utilizar o módulo 
-
-auxiliary/scanner/snmp/snmp_enum
-
-, desta forma, podemos informar uma comunidade que já conhecemos ou tentar enumerar comunidades com o seguinte módulo:
-
-auxiliary/scanner/snmp/snmp_login
 
 
 ## SNMP
@@ -80,6 +35,18 @@ Module options (auxiliary/scanner/snmp/snmp_enum):
 ![qownnotes-media-gSQJLi](../../media/qownnotes-media-gSQJLi.png)
 
 Considerar
+
+### metasploit
+
+no metasploit podemos utilizar o módulo 
+
+    auxiliary/scanner/snmp/snmp_enum
+
+, desta forma, podemos informar uma comunidade que já conhecemos ou tentar enumerar comunidades com o seguinte módulo:
+
+    auxiliary/scanner/snmp/snmp_login
+
+
 
 ### SNMPWALK
 
@@ -179,12 +146,6 @@ for p in processes.values():
     print(p)
 ```
 
-
-## snmpcheck
-
- Não funcionou quando eu tentei... Depois eu verifico o problema.
-
-
 ## SMB
 
 Podemos considerar algumas ferramentas para fazer a checagem desse serviço. São elas:
@@ -242,17 +203,7 @@ OBS: É importante ter o -sV para fazer a identificação pela versão do servi�
 
 smb-os-discovery, smb-enum-processes,smb-system-info.nse
 
-
-## nbtscan
-
-    sudo nbtscan -r 10.11.1.0/24
-
-    
-ou então um pouco mais de detalhes pode ser obtido como seguinte comando:
-
-    enum4linux -a -A <IP_VICTIM>
-    
-## Checking for null session or guest account
+### Checking for null session or guest account
 
     cme smb 10.11.1.xxx -u '' -p ''
     cme smb 10.11.1.xxx -u 'guest' -p ''
@@ -265,6 +216,16 @@ Para conseguir fazer enunmeração mais rapidamente, é interessante que utilize
 
     recurse on
     dir
+
+### nbtscan
+
+    sudo nbtscan -r 10.11.1.0/24
+
+    
+ou então um pouco mais de detalhes pode ser obtido como seguinte comando:
+
+    enum4linux -a -A <IP_VICTIM>
+    
 
 Desta forma, basta exxecutar esses dois comandos para ele fazer a busca via dir recursivamente
     
@@ -284,29 +245,136 @@ Desta forma, basta exxecutar esses dois comandos para ele fazer a busca via dir 
      
      nmap -sV -p 111 --script=rpcinfo 10.11.1.1-254
 
+ A premissa do NFS é o mesmo do SMB, compartilhar arquivos por meio da rede, acontece que no caso do NFS não é utilizado autenticação e autorização em suas versões 3 e 2, somente um grau de seguranã maior na sua versão 4.
+ 
+ Para explorar essa vulnerabilidade, primeiro precisamos fazer a enumeração do serviço por meio dos seguintes comandos:
+ 
+ 
+     sudo nmap -sS -p 111,2049 --script nfs-showmount,nfs-ls 10.11.1.72
+     #outra possibilidade também pode ser:
+     sudo apt update
+     sudo apt install libnfs-utils
+     #Com isso a gente consegue fazer a enumeração das permissividades dos arquivos em modo recursivo
+     nfs-ls -R nfs://10.11.1.72/home
+     
+     showmount -e 10.11.1.72
+     
+     nmap -sV -p 111 --script=rpcinfo 10.11.1.1-254
 
-# SMTP
 
-    nmap -sS -p 25 -n -sV 10.11.1.25
-    
-    nc -nv 10.11.1.217 25
-    VRFY root
-    VRFY idontexist
-    
-    VRFY <username>
-    
-    user <username>
-    pass <password>
-    list
-    
-    retr 1
-    retr 2
-    
-# RDP
+![qownnotes-media-wrgegz](../../media/qownnotes-media-wrgegz.png)
 
-        sudo nmap -sS --script vulners,rdp* 10.11.1.123
+### Exploitation
+
+Assim que fizermos a enumeração, vamos identificar quais são os IDs pertinenetes aos arquivos lá constados no share via NFS, mas isso só é válido nas versões 2 e 3  do protocolo. A versão 4 já é mais segura! Basta adicionarmos o usuário e o grupo do usuário cujo uid e guid corespondem ao mesmo que foi identificao no momento da enumeração.
+
+    sudo adduser --uid 1014 pwn
+    sudo addgroup --gid 1014 pwn_group
+    sudo usermod -a -G pwn_group pwn
+
+    mount.nfs -o vers=3 10.11.1.72:/home /tmp/mount_dir
     
-# HTTP
+    
+
+    
+
+## DNS
+
+### Enumerate domain
+
+Primeiro temos que verificar se a gente consegue obter o nome do domínio por mieo de uma resolução invesrsa de DNS da seguinte maneira:
+Informar o serviço de DNS encontrado por meio do comando abaixo:
+    
+    sudo nmap -sU -p 53 192.168.134.0/24 -oG dns_enum_lab.txt
+    #Assim que achado o DNS server (porta 53 aberta), fazemos um nslookup ou host para um host da rede
+    #host <IPS_DA_REDE> <IP_DNS_SERVER>
+    host 192.168.134.149 192.168.134.149
+    
+
+    nslookup
+    server 192.168.134.149    
+![qownnotes-media-GwrWbS](../../media/qownnotes-media-GwrWbS.png)
+
+    host -t ns mailman.com # Para encontrar o name server do domínio
+
+
+### Enumerating subdomains
+
+
+Brute-force: 
+
+	dnsrecon -d target.com -D wordlist.txt -t brt
+	
+**OBS: wordlist can be found at:**
+
+**C:\Users\olive\Desktop\acosta\owncloud\Tools_Utilities\hacking-tools\fuzzdb\discovery\dns**
+
+
+### DNS cache snooping: 
+	
+	dnsrecon -t snoop -D wordlist.txt -n 2.2.2.2 where 2.2.2.2 is the IP of the target’s NS server
+Options
+--threads 8: Number of threads
+-n nsserver.com: Use a custom name server
+Output options
+--db: SQLite 3 file
+--xml: XML file
+--json: JSON file
+--csv: CSV file
+
+### DNS Zone transfer
+
+	dnsrecon -d target.com -t axfr
+	
+or
+	
+	host -l target.com <dns_server_address>
+	
+**OBS: First find which dns servers correspond to that domain with:**
+	
+	host -t ns target.com
+	
+![qownnotes-media-XJyjiZ](file://media/18886.png)
+
+DNS Query types:
+
+https://ns1.com/resources/dns-types-records-servers-and-queries
+
+### Enumeração de DNS (domínio)
+
+Preimeiro temos que identificar qual o servidor de DNS que responde por este serviço:
+
+    nmap -p 53 -sU --open 10.11.1.0/24 -oG dns_servers.txt
+    
+Assim que obtido o servidor, ou seja, obter a resposta do comando acima para os IPs que responderam com "open", configuramos ele no arquivo /etc/resolv.conf ccom a seguinte diretiva:
+
+    nameserver <IP_SERVER_DNS>
+
+Feito isso, executamos o seguinte comando para obter o nome de domínio da rede alvo:
+
+    fping -d -a -g 10.0.0.0/24 # -> reverse DNS lookup   
+    #ou
+    fping -d -A -a -g 10.0.0.0/24 #(para obter o endereço de IP ao lado do hostname)
+    
+![qownnotes-media-RkNxKi](../media/qownnotes-media-RkNxKi.png)
+
+
+Depois, tentamos realizar uma transferência de zona para obter informações a respeito do domínio:
+
+    host -t axfr thinc.local <IP_DNS_SERVER>
+    #ou
+    dig axfr thinc.local @<IP_DNS_SERVER> #Esse não funionou e não entendi o porquê
+    #ou
+    dnsenum thinc.local # pode ser informado a flag --dnsserver <IP_DNS_SERVER> para especificar o server de DNS
+    
+![qownnotes-media-TnBCdx](../media/qownnotes-media-TnBCdx.png)
+
+
+Dessa forma obtemos todas as informações a respeito daquele domínio. ALém disto, observamos um subdomínio especial ali e tentamos uma transferência de zona lá também, sem sucesso, mas anda temos mais uma possibilidade que é enumerar os subdomínios da seguinte forma:
+
+    dnsrecon -d _msdcs.thinc.local -D /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -t brt 
+
+## HTTP
     
     sudo nmap -sS -p 80,443 --script "http* and not http-brute and not http-slowloris" -n 10.11.1.123
 
