@@ -33,8 +33,7 @@ Module options (auxiliary/scanner/snmp/snmp_enum):
    VERSION    1                yes       SNMP Version <1/2c>
 
 ```
-
-<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+![qownnotes-media-gSQJLi](../../media/qownnotes-media-gSQJLi.png)
 
 Considerar
 
