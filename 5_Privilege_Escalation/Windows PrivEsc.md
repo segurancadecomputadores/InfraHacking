@@ -416,6 +416,6 @@ Com esse comando, verificamos que estamos no grupo NTAUTHORITY/SERVICE
     
     Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName,DriverVersion, Manufacturer | Where-Object {$_.DeviceName -like "*VMware*"}
  
-### Writable files
+## Writable files
  
      Get-ChildItem "C:\Program Files" -Recurse | Get-ACL | ?{$_.AccessToString -match "Everyone\sAllow\s\sModify"}

