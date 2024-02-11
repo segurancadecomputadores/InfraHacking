@@ -1,2 +1,9 @@
-# 1\_Information\_Gathering
+README
+=========
+
+root: ./
+
+​structure:
+  readme: README.md
+  summary: SUMMARY.md​
 

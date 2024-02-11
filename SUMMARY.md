@@ -1,4 +1,4 @@
-# Table of contents
+# SUMMARY
 
 * [1\_Information\_Gathering](README.md)
   * [Searching for exploits](<1\_Information\_Gathering/Searching for exploits 2024-02-10T19\_10\_27.md>)
