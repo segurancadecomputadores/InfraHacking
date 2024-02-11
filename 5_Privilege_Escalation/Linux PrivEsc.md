@@ -11,11 +11,23 @@ Seguindo o a mesma premissa do windows, vamos verificar primeiramente o kernel e
     chmod +x les.sh
     ./les.sh
 
+    cat /etc/issue
+    
+    cat /etc/*-release
+    
+    uname -a
+  
+    cat /proc/version
+
 Algo importante aqui na hora de escalar privilégios no sistema:
 
 **Considerar a compilação para sistemas 32 bits**
 
 https://www.geeksforgeeks.org/compile-32-bit-program-64-bit-gcc-c-c/
+
+## CheckHistory
+
+    history
 
 ## Navegar nos diretórios
 
@@ -28,6 +40,12 @@ https://www.geeksforgeeks.org/compile-32-bit-program-64-bit-gcc-c-c/
     ls -al /usr/src/
 
 OS COMANDOS AQUI SÃO EXECUTADOS TODOS NA MÁQUINA VÍTIMA
+
+## Enumerate Users
+
+    cat /etc/passwd
+    #non-system users
+    awk -F: '($3>=1000)&&($1!="nobody"){print $1}' /etc/passwd
 
 ## SUID e SGID
 
@@ -61,10 +79,24 @@ https://raw.githubusercontent.com/bngr/OSCP-Scripts/master/bangenum.sh
 
     netstat -nao
 
+### Network information
+
+    ip a
+    ifconfig
+    route
+    routel
+    ip route
+    
+    netstat -napl
+    netstat -naptl
+    
+    ss -anp
+
 ## Crontab (Serviços agendados)
 
     crontab -l
     cat /etc/crontab
+    ls -lah /etc/cron* 
 
 ## Process Enumeration
 
@@ -96,6 +128,15 @@ Procurar a string PASSWORD ou password dentro de arquivos
     find . -type f -exec grep -i -I "PASSWORD" {} /dev/null \;
 
     grep --color=auto -rnw '/' -ie "PASSWORD" --color=always 2> /dev/null
+
+### SensitiveFileContent
+
+    grep --color=auto -rnw '/' -ie "PASSWORD" --color=always 2> /dev/null
+    
+    
+Nesse caso e interessante considerar que o diretorio que busco as informacoes e um diretorio de configuracoes de aplicacoes '/etc':
+
+    grep --color=auto -rnw '/etc' -ie "PASSWORD" --color=always 2> /dev/null
 
 In memory passwords
     
@@ -149,7 +190,19 @@ CentOS, OpenSuse, Fedora, RHEL
 OpenBSD, FreeBSD
 
     pkg_info
-    
+
+
+## Enumerate writable/readable
+
+    find / -writable -type d 2>/dev/null
+
+
+### Enumerate unmounted disks
+
+    cat /etc/fstab 
+    mount
+    /bin/lsblk
+
 ## PATH Hijack
  
  Vide máquina [Pandora](Pandora.md#PrivEsc)

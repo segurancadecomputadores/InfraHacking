@@ -73,13 +73,15 @@ net localgroup group_name UserLoginName /add
 
 
 ## Starting word in "Run"
-winword
+
+    winword
 
 
 ## networking
-netsh wlan show profiles
 
-netsh wlan show profiles name="SSID_rede" key=clear
+    netsh wlan show profiles
+
+    netsh wlan show profiles name="SSID_rede" key=clear
 
 Utilitários
 ========================
@@ -101,7 +103,7 @@ cmd commands
 
 ## verify domain users in windows
 
-net user user_name /domain
+    net user user_name /domain
 
 ## update de GPOs
 
@@ -109,9 +111,10 @@ net user user_name /domain
 
 ## getting Windows defender status
 
-get-mpcomputaerstatus
+    get-mpcomputaerstatus
 
 ## windows firewall in command line
+
 source:
 https://felipegbass.wordpress.com/2012/07/07/gerenciando-o-firewall-do-windows-via-command-prompt/
 

