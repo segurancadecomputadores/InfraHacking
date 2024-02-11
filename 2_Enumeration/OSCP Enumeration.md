@@ -42,8 +42,8 @@ Table of Contents
     - [Oracle TNS listener (1521/tcp)](OSCP%20Enumeration.md#OracleTNSListener)
 NFS (2049/tcp)
 MySQL (3306/tcp)
-RDP (3389/tcp)
-SIP (5060/udp)
+    - [RDP (3389/tcp)](OSCP%20Enumeration.md#RDP)
+    - [SIP (5060/udp)](OSCP%20Enumeration.md#SIP)
 PostgreSQL (5432/tcp)
 VNC (5900/tcp)
 AJP (8009/tcp)
@@ -51,32 +51,11 @@ Active Directory
 Enumeration
 Host
 
-## HostDiscovery
 
-### fping
-
-    fping -a -q -g 10.0.0.0/24  -> pingar uma vez cada host da rede especificada com a opção -g
-    
-    fping -q -g 10.0.0.0/24 -a -> só mostra os hosts ativos --alive e -q de quiet
-    
-    fping -d -g 10.0.0.0/24 -> reverse DNS lookup 
-    
-    fping -i 1 -g 10.0.0.1/24 -> fastest ping scan
-    
-### Bettercap 
-
-    bettercap -eval "net.probe on; sleep 3;q"
-
-formatting the response
-
-	bettercap -eval "net.probe on; sleep 3;q" | cut -d' ' -f 4 | sed ':a;N;$! ba;s/\n/,/g'
-
-
-### NMAP
-
-    nmap -sn -n 10.11.1.0/24
 
 ## PortScan
+
+### nmap
 
 Full TCP port scan
     
@@ -91,6 +70,33 @@ Top 20 UDP port scan
     sudo nmap -Pn -sU -sV -sC --top-ports=20 -oN top_20_udp_nmap.txt <hostname>
 
     nmap -sU -p 53,161,111,137,139,500,2049 -Pn 10.11.1.0/24
+
+### netcat
+
+    nc -z -w 1 -n -v 10.11.1.70 500
+    nc -z -w 1 -n -v 10.11.1.70 500-1000
+
+    nc -u -z -w 1 -n -v 10.11.1.70 161
+
+### bash pseudo devices
+
+    /dev/$protocol/$host/$port
+
+    if timeout 5 bash -c '</dev/tcp/kernel.org/443 &>/dev/null'
+    then
+      echo "Port is open"
+    else
+      echo "Port is closed"
+    fi
+
+ou
+
+    timeout .1 bash -c "echo /dev/tcp/10.11.1.5/80" && echo "port 80 is open"
+
+### Legion (gui app)
+
+    sudo legion
+
 
 ## Proxychains
 
@@ -138,13 +144,18 @@ SMTP (25/tcp)
 
 Version detection + NSE scripts
 
+    nmap -sS -p 25 -n -sV 10.11.1.25
+    
     nmap -Pn -sV -p 25 "--script=banner,(smtp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN tcp_25_smtp_nmap.txt <hostname>
 
 smtp-user-enum
 
     /home/kali/.local/bin/smtp-user-enum -V -m RCPT -w -f '<user@example.com>' -d 'domain.local' -U "/usr/share/metasploit-framework/data/wordlists/unix_users.txt" <hostname> 25 2>&1 | tee "tcp_25_smtp_user-enum.txt"
 
-
+    nc -nv 10.11.1.217 25
+    #ou
+    telnet 10.10.10.10 25
+    
     VRFY root
     VRFY <username>
     
@@ -154,6 +165,7 @@ smtp-user-enum
     
     retr 1
     retr 2
+    
 
 ### DNS
 
@@ -620,7 +632,9 @@ Version detection + NSE scripts
     
     nmap -Pn -sV -p 3389 --script="banner,(rdp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "tcp_3389_rdp_nmap.txt" <hostname>
 
-SIP (5060/udp)
+        sudo nmap -sS --script vulners,rdp* 10.11.1.123
+
+### SIP
 Scans for SIP devices on network
 
 svmap <hostname>

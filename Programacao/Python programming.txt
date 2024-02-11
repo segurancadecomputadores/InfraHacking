@@ -1,0 +1,223 @@
+Python programming
+========================
+
+## Simples HTTP Serve
+
+    python3 -m http.server 80
+
+## installing libraries (modules)
+
+First, install pip of python:
+
+	apt-get update
+	apt-get install python3-pip
+then:
+
+	pip3 install <library_name> 
+
+para instalar par ao sistema como um todo é necessário a flag --system
+
+exemplo:
+
+	pip3 install --system pandas
+
+
+printing without new line
+python 3
+
+print('string', end='')
+
+python 2
+
+print 'string',
+
+## User input
+
+    
+
+## environment variables
+
+source : https://able.bio/rhett/how-to-set-and-get-environment-variables-in-python--274rgt5
+	## environment variables
+	import os
+	
+	# Set environment variables
+	os.environ['API_USER'] = 'username'
+	os.environ['API_PASSWORD'] = 'secret'
+	
+	# Get environment variables
+	USER = os.getenv('API_USER')
+	PASSWORD = os.environ.get('API_PASSWORD')
+
+	#Getting non-existent keys
+	FOO = os.getenv('FOO') # None
+	BAR = os.environ.get('BAR') # None
+	BAZ = os.environ['BAZ'] # KeyError: key does not exist.
+
+## python command line reference
+
+![qownnotes-media-lKqgan](../../media/21077.png)
+
+__________________________________________________________
+
+## socket connection client
+
+    import socket
+    
+    sock = socket.socket(socket.AF_INET	, socket.SOCK_STREAM)
+    sock.connect("ip", port)
+    sock.send("Teste")
+    sock.recv(2048)
+
+
+--------------------------------------------------------
+---------------------------------------------
+## openning a process within python
+
+source:   https://www.endpoint.com/blog/2015/01/28/getting-realtime-output-using-python
+
+    import subprocess
+    
+    p = subprocess.Popen("pwd", stdout=subprocess.PIPE)
+    result = p.communicate()[0]
+    print result
+
+
+## empty dicionary in python
+
+	
+	items= {}
+	or
+	items= dict()
+
+## empty list in python
+
+	items = []
+	items = list()
+	
+##  concatenating strings
+	
+	for scan in scans.scans:
+		scan_rows = "".join(scan_rows+ scan.uuid + ";" +scan.name +"\n")
+		
+
+## File handling with python
+
+source: https://www.guru99.com/reading-and-writing-files-in-python.html
+
+### How to Read a File
+Not only you can create .txt file from Python but you can also call .txt file in a "read mode"(r).
+
+Step 1) Open the file in Read mode
+
+	f=open("guru99.txt", "r")
+Step 2) We use the mode function in the code to check that the file is in open mode. If yes, we proceed ahead
+
+	if f.mode == 'r':
+Step 3) Use f.read to read file data and store it in variable content
+
+	contents =f.read()
+Step 4) print contents
+
+read each line of a file:
+
+	temp = file.read().splitlines()
+	
+source: https://stackoverflow.com/questions/12330522/how-to-read-a-file-without-newlines
+
+### READ FILE FROM COMMAND LINE
+
+    if(sys.argv[1]):
+        try:
+            f = open(sys.argv[1], "r")
+        except:
+            help()
+    
+        temp = f.read().splitlines()
+        for name in temp:
+            username_generator(name)
+    else:
+        help()
+
+
+# requests lib
+
+## get requests
+	r = requests.get('https://github.com/timeline.json')
+
+    with parameters:
+    	payload = {'key1': 'value1', 'key2': 'value2'}
+    	r = requests.get("http://httpbin.org/get", params=payload)
+    
+## post request
+	r = requests.post("http://httpbin.org/post")
+
+with parameters:
+
+	payload = {'key1': 'value1', 'key2': 'value2'}
+	r = requests.post("http://httpbin.org/post", data=payload)
+	print r.text
+	{
+	  ...
+	  "form": {
+	    "key2": "value2",
+	    "key1": "value1"
+	  },
+	  ...
+	}
+	
+	
+Pratical example:
+
+	headers = {
+	'Content-Type': 'application/x-www-form-urlencoded',
+	'TAPI-ID': MB_TAPI_ID,
+	'TAPI-MAC': tapi_mac
+	}
+	
+	res = requests.post('https://mercadobitcoin.net'+REQUEST_PATH, headers=headers, data=params, proxies={'http':'http://127.0.0.1:8080', 'https':'https://127.0.0.1:8080'}, verify=False)
+	printres.text)
+
+### Basic Fuzzer
+
+```
+import requests
+import sys
+
+def help()
+    print("Usage: python basic_fuzzer.py <payload_list>")
+
+def http_request_custom(payload)
+
+    #s = requests.Session() 
+    # all cookies received will be stored in the session object
+    url = 'http://intentions.htb/api/v1/gallery/user/genres'
+    # headers = {'Content-Type': 'application/json'}
+    cookies = {'token': 'working'}
+    proxies={'http':'http://127.0.0.1:8080', 'https':'https://127.0.0.1:8080'}
+    r = requests.get(url, cookies=cookies)`
+    myobj = {'genres': 'food,travel,nature, + payload }
+    x = requests.post(url, json = myobj, cookies = cookies, proxies=proxies)
+    r = requests.get('http://intentions.htb/api/v1/gallery/user/feed', cookies=cookies)
+    print(r.text)
+
+##############################################
+## MAIN                                     ##
+##############################################
+if(sys.argv[1]):
+    try:
+        f = open(sys.argv[1], "r")
+    except:
+        help()
+
+    temp = f.read().splitlines()
+    for name in temp:
+        http_request_custom(name)
+else:
+    help()
+
+
+
+
+
+```

@@ -1,0 +1,13 @@
+Spidering
+========================
+## Non Authenticated
+
+wget -r -l 8 --no-check-certificate https://domain.com 
+
+--spider: essa opção faz com que o wget não baixe as páginas
+-r recursivo
+-l level que pode chegar a partir do root directory, seria o primeiro level
+--no-check-certificte ignorar erros de certificado
+
+
+## Authenticated
