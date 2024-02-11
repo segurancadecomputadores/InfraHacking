@@ -124,14 +124,6 @@ snmpwalk
     
     snmpwalk -c public -v 2c <hostname>
 
-**Importante notar que este comando consegue obter mais informações a respeito do serviço SNMP, do servidor, inclusive enumerar usuários e arquivos do sistema***
-
-    snmpwalk -c public -v2c <hostname> . | tee /tmp/snmpwalk_full.txt
-
-    snmpwalk -c public -v1 <hostname> . | tee /tmp/snmpwalk_full.txt
-
-Vale considerar que temos que observar as pastas que conseguirmos ver de webservers, por exemplo, além de credenciais em texto claro em linha de comando, também. Foram os cenários que observei no hack the box
-
 snmpbulkwalk e snmp_process_list.py
 
     sudo apt update

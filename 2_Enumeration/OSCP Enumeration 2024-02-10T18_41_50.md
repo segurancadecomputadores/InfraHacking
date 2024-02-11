@@ -3,7 +3,7 @@ OSCP Enumeration
 
 <https://github.com/oncybersec/oscp-enumeration-cheat-sheet/blob/main/README.md>
 
-![scribble](../../media/Teste2.png)
+![scribble](../media/Teste2.png)
 
 
 OSCP Enumeration Cheat Sheet
@@ -491,7 +491,7 @@ Importar o certificado:
     
     TLS_CACERT    /path/to/ldap.pem
     
-![qownnotes-media-qSTWZx](../../media/qownnotes-media-qSTWZx.png)
+![qownnotes-media-qSTWZx](../media/qownnotes-media-qSTWZx.png)
 
     ldapsearch -H ldaps://dc1.scrm.local -Z -D ksimpson@scrm.local -w ksimpson -b "DC=scrm,DC=local" "(objectClass=user)"
 
