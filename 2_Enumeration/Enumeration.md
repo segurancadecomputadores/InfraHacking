@@ -57,7 +57,7 @@ Feito isso, executamos o seguinte comando para obter o nome de domínio da rede 
     #ou
     fping -d -A -a -g 10.0.0.0/24 #(para obter o endereço de IP ao lado do hostname)
     
-![qownnotes-media-RkNxKi](../../media/qownnotes-media-RkNxKi.png)
+![qownnotes-media-RkNxKi](../media/qownnotes-media-RkNxKi.png)
 
 
 Depois, tentamos realizar uma transferência de zona para obter informações a respeito do domínio:
@@ -68,7 +68,7 @@ Depois, tentamos realizar uma transferência de zona para obter informações a 
     #ou
     dnsenum thinc.local # pode ser informado a flag --dnsserver <IP_DNS_SERVER> para especificar o server de DNS
     
-![qownnotes-media-TnBCdx](../../media/qownnotes-media-TnBCdx.png)
+![qownnotes-media-TnBCdx](../media/qownnotes-media-TnBCdx.png)
 
 
 Dessa forma obtemos todas as informações a respeito daquele domínio. ALém disto, observamos um subdomínio especial ali e tentamos uma transferência de zona lá também, sem sucesso, mas anda temos mais uma possibilidade que é enumerar os subdomínios da seguinte forma:
@@ -76,7 +76,7 @@ Dessa forma obtemos todas as informações a respeito daquele domínio. ALém di
     dnsrecon -d _msdcs.thinc.local -D /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -t brt 
     
 
-![qownnotes-media-nsaqgy](../../media/qownnotes-media-nsaqgy.png)
+![qownnotes-media-nsaqgy](../media/qownnotes-media-nsaqgy.png)
 
 
 
@@ -105,7 +105,7 @@ Verbose
 
     	nmap -v --script all hosts
 
-Para mais detalhes em outros tipos de scan com nmap pode verificar [esta nota](Nmap.md)
+Para mais detalhes em outros tipos de scan com nmap pode verificar [esta nota](..%2FTools%2FNmap.md)
 
 ## netcat
 
