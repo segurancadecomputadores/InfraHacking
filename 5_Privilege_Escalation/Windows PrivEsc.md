@@ -1,6 +1,6 @@
 # Windows PrivEsc
 
-1. Navegar nos diretorios do usuario para ver se existe algo ali que possa nos fornecer uma credencial ou algum bionario que inicie um servico/programa vulneravel a escalacao de privilegio
+1. [Check](<Windows_PrivEsc.md#DirectoryEnum>) Navegar nos diretorios do usuario para ver se existe algo ali que possa nos fornecer uma credencial ou algum bionario que inicie um servico/programa vulneravel a escalacao de privilegio
 2. [Check](<Windows PrivEsc.md#Winpeas>) Rodar o WinPEAS para verificar se existe algum servico disponivel para exploracao com permissoes demais. Aqui temos que usar o accesschk
 3. [Check](<Windows PrivEsc.md#PowerUp>) Rodar o PowerUp
 4. [Check](<Windows PrivEsc.md#Credenciais no registro>) checar credenciais no registro do windows
