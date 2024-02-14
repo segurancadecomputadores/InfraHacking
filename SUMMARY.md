@@ -130,7 +130,7 @@
   * [Nmap 2024-02-10T21\_22\_44](<Tools/Nmap 2024-02-10T21\_22\_44.md>)
   * [Nmap](Tools/Nmap.md)
   * [Responder](Tools/Responder.md)
-  * [QOwnNotes](tools/qownnotes.md)
+  * [QOwnNotes](Tools/qownnotes.md)
   * [Scripts](Tools/Scripts.md)
   * [Winrm](Tools/Winrm.md)
   * [Wireshark](Tools/Wireshark.md)
