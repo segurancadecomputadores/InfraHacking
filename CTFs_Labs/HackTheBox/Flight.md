@@ -4,11 +4,13 @@
 
 Nmap script
 
-![qownnotes-media-VMuwah](../../media/qownnotes-media-VMuwah.png)
+![qownnotes-media-VMuwah](../../.gitbook/assets/qownnotes-media-VMuwah.png)
+
+![qownnotes-media-eKewwb](../../.gitbook/assets/qownnotes-media-eKewwb.png)
 
 UDP scan
 
-![qownnotes-media-VMgxgZ](../../media/qownnotes-media-VMgxgZ.png)
+![qownnotes-media-VMgxgZ](../../../media/qownnotes-media-VMgxgZ.png)
 
 Full TCP scan
 
