@@ -9,7 +9,7 @@ Nmap script
 ![qownnotes-media-eKewwb](../../.gitbook/assets/qownnotes-media-eKewwb.png)
 
 UDP scan
-
+As imagens funcionaram, mas agora quero testar a sincronização com o gitbook.
 ![qownnotes-media-VMgxgZ](../../../media/qownnotes-media-VMgxgZ.png)
 
 Full TCP scan
