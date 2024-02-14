@@ -166,3 +166,15 @@ Continuando a enumeração:
     crackmapexec smb 10.10.11.187 -u 's.moon' -p 'S@Ss!K@*t13' --shares
 
 ![qownnotes-media-Swipnb](../../../media/qownnotes-media-Swipnb.png)
+
+Nesse momento, é interessante considerar a possibilidade de explorar o serviço via SMB, dado que temos autorização de escrita em um dos compartilhamentos listados. Temos alguns vetores para este caso,sendo eles documentados [aqui](../../3_Exploitation/SMB.md)
+
+Utilizando um desktop.ini com o exemplo obtido na referência acima, conseguimos a credencial do c.bum
+
+c.bum:Tikkycoll_431012284
+
+Que tem acesso de escrita em uma pasta compartilhada também chamada Web:
+
+    crackmapexec smb 10.10.11.187 -u c.bum -p 'Tikkycoll_431012284' --shares
+
+
