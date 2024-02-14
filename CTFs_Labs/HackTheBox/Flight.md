@@ -12,7 +12,7 @@ UDP scan
 
 Full TCP scan
 
-<figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+![image](../../.gitbook/assets/image%20(1).png)
 
 Então temos:
 
