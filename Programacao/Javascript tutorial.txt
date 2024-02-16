@@ -1,0 +1,179 @@
+Javascript tutorial
+========================
+## Javascript concepts
+
+You can't see cookies for other sites.
+You can't see HttpOnly cookies.
+All the cookies you can see are in the document.cookie property, which contains a semicolon separated list of name=value pairs.
+
+ Javascript is prototyped, so no need to declare classes like other languages
+
+## creating a variable
+
+integer var a = 12;
+String var a = "Testing";
+Boolean var a = false;
+Null var a = null;
+Undefined var a;
+
+let a = 10; -> this means that variable a is only available inside  a scope { }
+const a = "Cannot be changed"
+
+## variables scope
+
+  ### Global
+    var globa_var = 100;
+    
+    function teste() {
+        alert(global_var);
+    }
+    
+  ### local
+  
+     function teste() {
+         var local_var = 10;
+         alert(local_var);
+     }
+
+## Conditionals
+
+    var a = 10;
+    var b = 10;
+
+    switch(a) {
+        case 10:
+            //do something...
+            break;
+        case 20:
+            //do something..
+         default:
+             //do something...
+    }
+
+    if( a == b) {
+        alert('a == b');
+    } else if( a> b) {
+        alert('a > b');
+    } else {
+        alert('a < b');
+    }
+
+
+## Loops
+do {
+// comments
+/*comments
+different lines*/
+} while ( a < 10);
+
+while(a < 10) {
+}
+
+for (var i = 0; i<10; i++){
+
+}
+
+## Data types
+
+### float
+
+    var a = 10.12;
+### int
+    var a =10;
+    
+### string
+    var = 'string teste';
+ or
+
+    var = "string teste";
+    var = "string test with one quote inside' it";
+
+### array
+
+    var a = ['XSS', 'String', 'Alison'];
+    var demo = new Array("XSS", "CSRF", "SQLi");
+    var demo = new Array();
+    var demo[0]= "XSS";
+    
+    
+## Object
+
+ Javascript is prototyped, so no need to declare classes like other languages
+
+var car = {name : "Fit", color: "Cinza", ano: 2009, liga: function liga() { console.log("Andando...") } }
+var cellphone = {name: "Galaxy Samsung A8+", year: 2009, liga: function liga() { console.log("Liga")}}
+
+Javascript Events
+
+onmouseover
+onmouseout
+onkeydown
+onkeypress
+onload
+onclick
+onchange
+
+# AJAX
+
+## GET Method
+
+function getAjax(url, success) {
+var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+xhr.open('GET', url);
+xhr.onreadystatechange = function() {
+if (xhr.readyState>3 && xhr.status==200) success(xhr.responseText);
+};
+xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+xhr.send();
+return xhr;
+}
+
+// example request
+getAjax('http://foo.bar/?p1=1&p2=Hello+World', function(data){ console.log(data); });
+
+
+## POST Method
+
+function postAjax(url, data, success) {
+
+var params = typeof data == 'string' ? data : Object.keys(data).map(
+function(k){ return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]) }
+).join('&');
+
+var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+xhr.open('POST', url);
+xhr.onreadystatechange = function() {
+if (xhr.readyState>3 && xhr.status==200) { success(xhr.responseText); }
+};
+xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+xhr.send(params);
+return xhr;
+}
+
+// example request
+postAjax('http://foo.bar/', 'p1=1&p2=Hello+World', function(data){ console.log(data); });
+
+// example request with data object
+postAjax('http://foo.bar/', { p1: 1, p2: 'Hello World' }, function(data){ console.log(data); });
+
+
+# Implementing a search box like google its not so scary...
+
+based on events like onkeydown or onkeypress, javascript gets the content from a form (input) and send via ajax with the following line of code:
+
+var xhtml = new XMLHttpRequest();
+
+xhtml.open('get', 'url', false);
+xhtml.send();
+return xhtml.responseText;
+
+Handle json response from web server
+
+var array_resp = JSON.parse(xhtml.responseText);
+
+
+# Enumerate objects in javascript
+for (var name in object_target) {
+    alert(name);
+}
