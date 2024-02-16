@@ -122,6 +122,10 @@ Ldapsearch
     ldapsearch -x -H ldap://<hostname> -D '' -w '' -b "DC=<domain_name>,DC=<tld>"
 
 
+lookupsid
+
+    impacket-lookupsid <domain>@<hostname>
+
 Via Web
 
 Não existe um comando específico para obter noomes de usuários específicos, por motivos óbvios, porém, podemos gerar possíveis nomes de usuários com o cewl, com o seguinte comando:
