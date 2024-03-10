@@ -1,6 +1,26 @@
 AD Lab
 ========================
 
+
+Baixar a ISO do site da microsoft:
+
+<https://go.microsoft.com/fwlink/p/?LinkID=2195167&clcid=0x409&culture=en-us&country=US>
+
+Dados de cadastro
+
+John
+Doe
+
+Saudi Arabia
+
+Saudi Arabia 
+
+[2024-03-08 16-57-03.mkv](../.gitbook/assets/2024-03-08 16-57-03.mkv)
+
+{%embed url="../.gitbook/assets/2024-03-08 16-57-03.mkv" %}
+
+Adicionar os usuários
+
 ```
 # Defina as informações necessárias
 $dominio = "seuDominio"
