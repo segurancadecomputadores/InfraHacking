@@ -10,7 +10,7 @@ A primeira coisa que é interessante considerarmos para enumeração de domínio
 
 Exemplo real:
 
-    runas /netonly /user:redecorp.br\a0106003 powershell
+    runas /netonly /user:domain.br\user powershell
     (será solicitado credencial e pode ser informado uma credencial inválida que o comando funcionará, mas por motivos óbvios, quaisquer comando que utilizemos não se autenticará na rede)
     
 Dessa forma teremos acesso administrativo por meio de uma console de powershell e enviaremos as credenciais para quaisquer protocolos que utilizaremos

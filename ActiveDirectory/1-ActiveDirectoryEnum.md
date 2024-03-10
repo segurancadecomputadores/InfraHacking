@@ -159,7 +159,3 @@ Aqui podemos aplicar algumas técnicas sendo elas user = password, mais os usuá
     crackmapexec smb hosts.txt -u users.txt -p passwords_test.txt --continue
     
     crackmapexec winrm hosts.txt -u users.txt -p passwords_test.txt --continue
-
-## 4 - Enumerar o domínio sem credencial
-
-    
