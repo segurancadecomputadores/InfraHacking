@@ -1,7 +1,7 @@
 SiverTicket
 ========================
 
-Até aqui a gente já deve obter as credenciais da conta SPN seguindo o que está escrito na página anterior. ([Kerberoasting](kerberoasting.md))
+Até aqui a gente já deve obter as credenciais da conta SPN seguindo o que está escrito na página anterior. ([Kerberoasting](Kerberoasting.md))
 
 No entanto, é necessário mais algumas informações pra que a gente consiga fazer o silver ticket, que consiste em gerar um ticket de SPN com as permissões que quisermos (full que seria o default das ferramentas, ou podemos setar as quais quisermos) para obter versatilidade nos recursos de rede para escalada de privilégio.
 
@@ -42,7 +42,7 @@ impacket-getPac scrm.local/ksimpson:ksimpson -targetUser ksimpson
 
 ### 3 - SPN
 
-O nome do SPN basicamente já teremos seguindo os passos anteriores documentados em [Kerberoasting](kerberoasting.md).
+O nome do SPN basicamente já teremos seguindo os passos anteriores documentados em [Kerberoasting](Kerberoasting.md).
 
 Depois disso, podemos gerar o silver ticket de maneira remota ou local na máquina da vítima:
 

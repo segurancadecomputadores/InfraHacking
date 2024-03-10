@@ -41,3 +41,27 @@ for ($i = 1; $i -le 10; $i++) {
 }
 
 ```
+```
+# Importa o módulo do Active Directory
+Import-Module ActiveDirectory
+
+# Loop para adicionar 10 usuários
+for ($i=1; $i -le 10; $i++) {
+    # Gera um nome de usuário único
+    $username = "User$i"
+
+    # Gera uma senha aleatória
+    $password = "P@ssw0rd$i"
+
+    # Cria um novo usuário
+    New-ADUser -SamAccountName $username -UserPrincipalName "$username@example.com" -Name "User $i" -GivenName "User" -Surname $i -Enabled $true -AccountPassword (ConvertTo-SecureString -AsPlainText $password -Force) -PassThru
+}
+
+Write-Host "Usuários adicionados com sucesso."
+```
+
+Add SPNs
+
+    New-ADUser -SamAccountName "svc_mysql" -UserPrincipalName "svc_mysql@home.lab" -Name "MySql" -GivenName "MySql Database" -Surname "Service" -Enabled $true -AccountPassword (ConvertTo-SecureString -AsPlainText "banana" -Force) -PassThru
+    Set-ADUser -identity svc_mysql -ServicePrincipalNames @{Add="MYSQL/datababse.home.lab"}
+

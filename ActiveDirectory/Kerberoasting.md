@@ -5,6 +5,8 @@ Kerberoasting
 setspn -T scrm.local -Q */*
 ```
 
+impacket
+
 Temos que focar no que for contas de serviço que não seja de máquinas, conforme print abaixo:
 
 <figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption><p>Usuário de serviço (não é de máquina)</p></figcaption></figure>
