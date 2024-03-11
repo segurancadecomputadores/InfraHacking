@@ -193,9 +193,7 @@ net group "Exchange Windows Permissions" /add redteam
 
 Precisaremos do powerview para fazer essa alteração de privilégios, porém temos duas formas, então vamos lá:
 
-#### PowerView
 
-#### impacket-ntlmrelayx
 
 ### Try command execution
 

@@ -65,3 +65,6 @@ Add SPNs
     New-ADUser -SamAccountName "svc_mysql" -UserPrincipalName "svc_mysql@home.lab" -Name "MySql" -GivenName "MySql Database" -Surname "Service" -Enabled $true -AccountPassword (ConvertTo-SecureString -AsPlainText "banana" -Force) -PassThru
     Set-ADUser -identity svc_mysql -ServicePrincipalNames @{Add="MYSQL/datababse.home.lab"}
 
+
+    New-ADUser -SamAccountName "svc_iis" -UserPrincipalName "svc_iis@home.lab" -Name "WebServer" -GivenName "Web" -Surname "Service" -Enabled $true -AccountPassword (ConvertTo-SecureString -AsPlainText "B@nana102030" -Force) -PassThru
+    Set-ADUser -identity svc_iis -ServicePrincipalNames @{Add="HTTP/webserver.home.lab"}
