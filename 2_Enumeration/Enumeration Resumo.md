@@ -13,7 +13,7 @@ basic nmap UDP
 
 All ports nmap
 
-    sudo nmap -p- -Pn -T5 -n <hostname> | tee nmap_fullportstcp_output.txt
+    sudo nmap -p- -Pn -T5 -n --max-retries 1 10.10.111.209 | tee nmap_fullportstcp_output.txt
 
 Vulns scan nmap
 

