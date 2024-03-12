@@ -22,19 +22,19 @@ Mais básico e lento
 
 Somente diretórios básico (sem considerar extensões dos arquivos)
 
-    gobuster dir -u http://<hostname> -w /usr/share/seclists/Discovery/Web-Content/common.txt -k -t 16 -o "tcp_port_protocol_s_ext_gobuster.txt"
+    gobuster dir --useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -u http://<hostname> -w /usr/share/seclists/Discovery/Web-Content/common.txt -k -t 16 -o "tcp_port_protocol_s_ext_gobuster.txt"
 
 Com extensões básico (common.txt)
 
-    gobuster dir -u http://<hostname> -w /usr/share/seclists/Discovery/Web-Content/common.txt -x "txt,html,php,asp,aspx,jsp" -k -t 16 -o "tcp_port_protocol_gobuster.txt"
+    gobuster dir --useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -u http://<hostname> -w /usr/share/seclists/Discovery/Web-Content/common.txt -x "txt,html,php,asp,aspx,jsp" -k -t 16 -o "tcp_port_protocol_gobuster.txt"
 
 Somente diretórios (SEM EXTENSÕES)
 
-    gobuster dir -u http://<hostname> -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -k -t 16 -o "tcp_port_protocol_gobuster.txt"
+    gobuster dir --useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -u http://<hostname> -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -k -t 16 -o "tcp_port_protocol_gobuster.txt"
     
 COM EXTENSÕES (MAIS DEMORADO)
     
-    gobuster dir -u http://apt.htb -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x "txt,html,php,asp,aspx,jsp" -k -t 16 -o "tcp_port_protocol_gobuster.txt"
+    gobuster dir --useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -u http://apt.htb -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x "txt,html,php,asp,aspx,jsp" -k -t 16 -o "tcp_port_protocol_gobuster.txt"
 
 
 
@@ -42,15 +42,15 @@ COM EXTENSÕES (MAIS DEMORADO)
 
 ### clone a website
 
-    wget -mk -nH http://domain.com
+    wget --header "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -mk -nH http://domain.com
 
-    wget -r -l 8 --no-check-certificate https://domain.com 
+    wget --header "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -r -l 8 --no-check-certificate https://domain.com 
 
 **Vale considerar que estes comandos não obtém todo o site caso ele seja construido com JS**
 
 Com proxy e rodando autenticado.
 
-    wget -r -l 8 --header='Cookie: OAMAuthnHintCookie=<<XXX>>; LoginCorpVivoCookie=<<XXX>>' --header='Authorization: Bearer <<JWT_HERE>>' --no-check-certificate -e https_proxy=127.0.0.1:8080 https://esaw-preprod.redecorp.br/esim-activation-view/
+    wget -r -l 8 --header='Cookie: OAMAuthnHintCookie=<<XXX>>; LoginCorpVivoCookie=<<XXX>>' --header "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" --header='Authorization: Bearer <<JWT_HERE>>' --no-check-certificate -e https_proxy=127.0.0.1:8080 https://esaw-preprod.redecorp.br/esim-activation-view/
 
 --spider: essa opção faz com que o wget não baixe as páginas
 -r recursivo
