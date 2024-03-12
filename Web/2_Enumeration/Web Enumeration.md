@@ -89,9 +89,9 @@ https://addons.mozilla.org/pt-BR/firefox/addon/wappalyzer/
 
 ### netcat
 
-    nc assine.vivo.com.br 80
+    nc domain.com.br 80
     HEAD / HTTP/1.1
-    Host: assine.vivo.com.br
+    Host: domain.com.br
     
     
 
@@ -149,9 +149,9 @@ Desenvolvi uma ferramenta que automatiza uma parte desse processo. Ela utiliza d
 
 ### waf detection
 
-    nmap -Pn --script http-waf-fingerprint meuvivo.vivo.com.br --script-args http-waf-fingerprint.intensive=1 -p443,80
+    nmap -Pn --script http-waf-fingerprint domain.com.br --script-args http-waf-fingerprint.intensive=1 -p443,80
     
-    nmap -Pn --script http-waf-detect meuvivo.vivo.com.br --script-args="http-waf-detect.aggro " -p443,80
+    nmap -Pn --script http-waf-detect domain.com.br --script-args="http-waf-detect.aggro " -p443,80
     
     wafw00f https://<hostname>/
 
