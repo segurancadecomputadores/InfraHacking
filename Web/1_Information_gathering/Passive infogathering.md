@@ -51,16 +51,6 @@ python sublist3r -d \<domain\>
 
 ![qownnotes-media-eYJOpJ](media/29314.png)
 
-### 6 - Shodan
-
-command line:
-
-	shodan init <API key>
-	shodan domain <domain>
-	
-	
-Web:
-
 ### 7 - recon-ng
 
 tutorial:
@@ -114,14 +104,6 @@ first commands:
 
 Open in browser or curl for automation purposes
 https://crt.sh/?q=\<domain\>
-
-### Builtwith
-
-https://builtwith.com/\<domain\>
-
-### hunter.io
-https://hunter.io/search/\<domain\>
-
 
 ## the Harvester
 
