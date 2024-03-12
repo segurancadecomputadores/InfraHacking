@@ -17,7 +17,7 @@ All ports nmap
 
 Better performance
 
-    sudo nmap -p- --max-retries 0 -Pn -T5 -n 10.10.10.84 | tee nmap_fullportstcp_output2.txt
+    sudo nmap -p- --max-retries 0 -Pn -T5 -n <hostname> | tee nmap_fullportstcp_output2.txt
 
 Vulns scan nmap
 
@@ -91,15 +91,15 @@ Enum4linux
 ### DNS
 Dig
     
-    dig axfr domain.com @dns_server
+    dig axfr <hostname> @<ip_dns_server>
 
 DNSEnum
     
-    dnsenum -dnsserver 10.10.10.123 friedzone.red
+    dnsenum -dnsserver <ip_dns_server> <hostname>
 
 dnsrecon
     
-    dnsrecon -d friendzone.red -n 10.10.10.123
+    dnsrecon -d <hostname> -n <ip_dns_server>
     
 ### SMTP
 
