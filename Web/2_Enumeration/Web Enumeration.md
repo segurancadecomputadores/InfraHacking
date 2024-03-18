@@ -36,6 +36,17 @@ COM EXTENSÕES (MAIS DEMORADO)
     
     gobuster dir --useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -u http://apt.htb -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x "txt,html,php,asp,aspx,jsp" -k -t 16 -o "tcp_port_protocol_gobuster.txt"
 
+<https://www.invicti.com/s/research/SVNDigger.zip>
+
+**CONSIDERAR AS SEGUINTES EXTENSÕES TAMBÉM**
+
+
+    .zip , .tar , .gz , .tgz , .rar , etc.: (Compressed) archive files
+    .java : No reason to provide access to Java source files
+    .txt : Text files
+    .pdf : PDF documents
+    .docx , .rtf , .xlsx , .pptx , etc.: Office documents
+    .bak , .old and other extensions indicative of backup files (for example: ~ for Emacs backup files)
 
 
 ## 2 - Front end code review comments and recon
@@ -77,6 +88,7 @@ https://addons.mozilla.org/pt-BR/firefox/addon/wappalyzer/
 
     whatweb -a 1 https://domain.com.br
     whatweb -a 3 https://domain.com.br
+    whatweb -a 4 https://domain.com.br
 
 ### httprint
 
@@ -193,7 +205,45 @@ python sublist3r -d \<domain\>
 ![qownnotes-media-eYJOpJ](../../../media/29314.png)
 
 
-## 5 - Enumeracoes especificas
+## 5 - Methods enumeration
+
+
+    nmap -p 443 --script http-methods --script-args http-methods.url-path='/index.php' domain.com.br
+
+Testing PUT method
+
+```
+PUT /webcrm/test HTTP/2
+Host: maykleads.makesystem.com.br
+Content-Length: 43
+
+<html>
+HTTP PUT Method is Enabled
+</html>
+
+# ou
+
+PUT /webcrm/test HTTP/2
+Host: maykleads.makesystem.com.br
+Content-Length: 43
+Content-Type: application/html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0
+
+<html>
+HTTP PUT Method is Enabled
+</html>
+```
+ou podemos utilizar o curl também
+
+    curl -X PUT http://127.0.0.1:9001/root/.ssh/authorized_keys -d 'content'
+    
+    curl -X PUT https://domain.com.br/url/test.html -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0' -d '<html>HTTP PUT Method is Enabled</html>'
+    
+    ##### Testing with X-HTTP-Method header
+    curl -X PUT https://maykleads.makesystem.com.br/webcrm/test.html -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0' -H 'X-HTTP-Method: PUT' -d '<html>HTTP PUT Method is Enabled</html>'
+
+
+## 6 - Enumeracoes especificas
 
 Look for links to other files inside the CSS files.
 
@@ -227,7 +277,7 @@ Enumerate all plugins
 
     wpscan --url $url --disable-tls-checks --no-update -e ap --plugins-detection aggressive -f cli-no-color 2>&1 | tee tcp_port_protocol_wpscan_plugins.txt
 
-## 6 - Enumeração de parâmetros
+## 7 - Enumeração de parâmetros
 
     ffuf -c -ic -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt -u http://apt.htb/clients.html?FUZZ= -fs 12146
     
@@ -237,7 +287,7 @@ Enumeração autenticado:
 
     ffuf -c -ic -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt -b 'Cookie_name1=xxxx; Cookie_name2=xxxx' -H 'Authorization: Bearer xxx' -u https://domain.br/esim-activation-bff/v1/qrcode?FUZZ -p 10 -fs 111,0 -x http://127.0.0.1:8080
     
-## 7 - Others
+## 8 - Others
 
 ### 502 Proxy Error
 

@@ -1,6 +1,8 @@
 Passive infogathering
 ========================
 
+# WSTG-INFO-01
+
 ## Passive information gathering
 
  Na prática, podemos utilizar as seguintes ferramentas para responder as seguintes perguntas:
@@ -8,13 +10,19 @@ Passive infogathering
  - What the applications do?
  - What language is it written in?
  -  what server software is tha application running on?
+
+
+Search for laeks
+
+<https://leak-lookup.com/>
+
   
 ### 2 - whois enumeration
   Trivial as:
 
 	whois <domain>
 	
-### 3 - Google Dork
+### 3 - Search engine
   As explained in the next sections
   
   source:
@@ -23,7 +31,10 @@ https://gbhackers.com/latest-google-dorks-list/#:~:text=Google%20Dorks%20List%20
 https://github.com/BullsEye0/google_dork_list/blob/master/google_Dorks.txt
 
 site:amil.com.br -www
-
+inurl:
+intitle:
+intext:
+inbody:
 filetype:pdf
 
 site:cnn.com

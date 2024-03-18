@@ -18,6 +18,8 @@ Com isso podemos executar o arquivo (caso seja um executável) conforme a permis
 
     find / -perm -u=s -type f 2>/dev/null
     find / -perm -g=s -type f 2>/dev/null
+    
+Nese ponto podemos abrangeer a análise de binários aqui quando encontramos algo que seja possível ser executado por meio do usuário root. Para isso devemos considerar esta [nota]()
 
 ## Kernel exploitation
 
