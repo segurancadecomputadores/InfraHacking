@@ -61,7 +61,7 @@ COM EXTENSÕES (MAIS DEMORADO)
 
 Com proxy e rodando autenticado.
 
-    wget -r -l 8 --header='Cookie: OAMAuthnHintCookie=<<XXX>>; LoginCorpVivoCookie=<<XXX>>' --header "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" --header='Authorization: Bearer <<JWT_HERE>>' --no-check-certificate -e https_proxy=127.0.0.1:8080 https://esaw-preprod.redecorp.br/esim-activation-view/
+    wget -r -l 8 --header='Cookie: OAMAuthnHintCookie=<<XXX>>; LoginCorpCookie=<<XXX>>' --header "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" --header='Authorization: Bearer <<JWT_HERE>>' --no-check-certificate -e https_proxy=127.0.0.1:8080 https://domain.com.br/url/
 
 --spider: essa opção faz com que o wget não baixe as páginas
 -r recursivo
