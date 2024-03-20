@@ -152,7 +152,7 @@ Como primeiro objetivo temos que levar em conta a enumeração de portas/serviç
 
 linux
 
-    nslookup -type=srv _ldap._tcp.dc._msdcs.redecorp.br
+    nslookup -type=srv _ldap._tcp.dc._msdcs.domain.com.br
     nslookup -type=srv _kerberos._tcp.EXMAPLE.COM
     nslookup -type=srv _kpasswd._tcp.EXAMPLE.COM
     nslookup -type=srv _ldap._tcp.EXAMPLE.COM
@@ -162,7 +162,7 @@ windows
 
     nslookup
     set type=all
-    _ldap._tcp.dc._msdcs.redecorp.br
+    _ldap._tcp.dc._msdcs.domain.com.br
 
 Outra opção seria:
 
