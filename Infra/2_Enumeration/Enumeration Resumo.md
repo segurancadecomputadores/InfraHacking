@@ -101,6 +101,8 @@ DNSEnum
     
     dnsenum -dnsserver <ip_dns_server> <hostname>
 
+**Aqui o dnsenum utiliza do /etc/resolv.conf para fazer transferência de zona**
+
 dnsrecon
     
     dnsrecon -d <hostname> -n <ip_dns_server>

@@ -371,7 +371,12 @@ Depois dee enumerar, eh interessante montarmos o volume pra verificar se temos a
     
 ## Services enumeration and Network information
 
-A presença de interfaces virtuais pode aferir a ideia de existir máquinas virtuais na máquina ou de anti vírus instalado.
+A presença de interfaces virtuais pode aferir a ideia de existir máquinas virtuais na máquina ou de anti vírus instalado
+
+
+Esse comando enumera as conexões e portas abertas, pelas quais são fornecidos os serviços de rede tais como banco de dados, aplicações web e/ou serviços que estajam vulneráveis a algum tipo de exploit público, por exemplo .
+Pesquisando a respeito do serviço, podemos encontrar fragilidades que podemos explorar para escalar privilégios na máquina. Mas, claro, sempre visando serviços que rodam em modo system (que é nosso alvo)
+
 
     ipconfig /all
     route print
