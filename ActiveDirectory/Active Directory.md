@@ -287,7 +287,7 @@ Se der sucesso:
     
 ### Kerberoasting
 
-Enumerate SPNs
+Enumerate SPNs... Se atentar a este ponto, visto que enumerando localmente na máquina, são retornados vários SPNs pré configurados do próprio domínio. Temos que enumerar os que estão associados a uma conta de serviço (user), pois a probabilidade de ter uma senha fraca é maior.
 
     setspn -T home.lab -Q */*
 
