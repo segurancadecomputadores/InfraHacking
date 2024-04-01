@@ -31,7 +31,8 @@ Aqui sossegado:
     
 ![qownnotes-media-tKQdxa](../../../media/qownnotes-media-tKQdxa.png)
 
-![qownnotes-media-qApPLP](../../.gitbook/assets/qownnotes-media-qApPLP.png)
+![qownnotes-media-qApPLP]([https://github.com/alisonocosta/InfraHacking/assets/12753100/2f24c0bc-737b-4feb-8114-89195af67a87](https://github.com/alisonocosta/InfraHacking/blob/main/.gitbook/assets/qownnotes-media-qApPLP.png))
+.gitbook/assets/qownnotes-media-qApPLP.png)
 
     john --wordlist=/usr/share/wordlists/rockyou.txt hash.txt
     
