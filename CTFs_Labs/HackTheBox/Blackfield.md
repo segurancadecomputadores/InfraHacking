@@ -1,7 +1,7 @@
 Blackfield
 ========================
 
-![qownnotes-media-mCrkDI](../../.gitbook/assets/qownnotes-media-mCrkDI.png)
+![qownnotes-media-mCrkDI](../../media_wordpress/qownnotes-media-mCrkDI.png)
 
 DNS
 
