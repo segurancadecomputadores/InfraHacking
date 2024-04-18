@@ -27,6 +27,15 @@ Vulns scan nmap
 
 ### HTTP 
 
+Checklist
+
+- [ ] Enumerar URLs/arquivos/endpoints/consoles administrativas desconhecidos
+- [ ] Examinar o conteúdo da página (comentários, javascript, links escondidos)
+- [ ] A aplicação possui CVEs?
+- [ ] Verificar os cabeçalhos de resposta do servidor
+- [ ] Brute Force formulários de login
+- [ ] Navegação manual
+
 URL brute force common without extensions
 
     gobuster dir --useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -u http://<hostname> -w /usr/share/seclists/Discovery/Web-Content/common.txt -k -t 16 -o "tcp_port_protocol_s_ext_gobuster.txt"
