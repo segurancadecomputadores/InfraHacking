@@ -1,6 +1,19 @@
 Active
 ========================
 
+## Referencia em video
+
+![type:video](https://youtube.com/embed/Me_IsOSDiVs)
+
+Temas envolvidos:
+
+
+[Enumeração DNS](https://www.youtube.com/watch?v=Me_IsOSDiVs&t=180s)  
+[Enumeração de usuários Kerberos kerbrute](https://www.youtube.com/watch?v=Me_IsOSDiVs&t=390s)  
+[Groups.xml](https://www.youtube.com/watch?v=Me_IsOSDiVs&t=600s)  
+[AsRep Roasting](https://www.youtube.com/watch?v=Me_IsOSDiVs&t=1045s)  
+[Kerberoasting](https://www.youtube.com/watch?v=Me_IsOSDiVs&t=1400s)  
+
     sudo nmap_enum active.htb | tee nmap_output.txt
 
 Aqui sossegado:
@@ -38,3 +51,4 @@ Aqui sossegado:
     impacket-psexec 'active.htb/Administrator:Ticketmaster1968@10.10.10.100'
     
 ![qownnotes-media-LCzGOy](https://github.com/alisonocosta/InfraHacking/tree/main/.gitbook/assets/qownnotes-media-LCzGOy.png)
+

@@ -134,12 +134,6 @@ enum4linux -u mhope -p '4n0therD4y@n0th3r$' 10.10.10.172
 crackmapexec smb 10.10.10.248 -u usernames.txt -p 'NewIntelligenceCorpUser9876'
 ```
 
-### Bloodhound
-
-```
-bloodhound-python -u mhope -p '4n0therD4y@n0th3r$' -d MEGABANK.LOCAL -v --zip -c All -dc MEGABANK.LOCAL -ns 10.10.10.172
-```
-
 ### Hashes
 
 ```

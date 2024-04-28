@@ -1,20 +1,45 @@
 Web Enumeration
 =======================
-Checklist
+## Checklist
 
-- Start by **identifying** the **technologies** used by the web server. Look for **tricks** to keep in mind during the rest of the test if you can successfully identify the tech.Any **known vulnerability** of the version of the technology?
-- Using any **well known tech**? Any **useful trick** to extract more information?
-- Any **specialised scanner** to run (like wpscan)?
-- Launch **general purposes scanners**. You never know if they are going to find something or if the are going to find some interesting information.
-- Start with the **initial checks**: **robots**, **sitemap**, **404** error and **SSL/TLS scan** (if HTTPS).
-- Start **spidering** the web page: It's time to **find** all the possible **files, folders** and **parameters being used.** Also, check for **special findings**.*Note that anytime a new directory is discovered during brute-forcing or spidering, it should be spidered.*
-- **Directory Brute-Forcing**: Try to brute force all the discovered folders searching for new **files** and **directories**.*Note that anytime a new directory is discovered during brute-forcing or spidering, it should be Brute-Forced.*
-- **Backups checking**: Test if you can find **backups** of **discovered files** appending common backup extensions.
-- **Brute-Force parameters**: Try to **find hidden parameters**.
-- Once you have **identified** all the possible **endpoints** accepting **user input**, check for all kind of **vulnerabilities** related to it.
+- [ ] [**Navegue na aplicação**](#navegue-pela-aplicacao): Identifique **tecnologias da aplicação** e **entry points**
+- [ ] [**Procurar por CVEs**](#procurar-por-cves): Busque por vulnerabilidades já conhecidas
+- [ ] [**WAF**](#enumeracao-waf): Detectar e enumerar WAF
+- [ ] [**Brute-Force de diretórios e arquivos**](#enumeracao-de-diretorios): Procurar **pastas/endpoints** via URL
+- [ ] [**Brute-Force - Arquivos de backup**](#enumeracao-de-diretorios): Procurar por **arquivos via URL**
+- [ ] [**Revisao do código do frontend**](#revisao-de-codigo-do-frontend-comentarios-e-reconhecimento): Baixe o código da aplicação
+- [ ] [**Scanning**](#scanning): Rodar scan na aplicação
+- [ ] [**Procurar subdomínios**](#procurar-subdominios): **Procurar por subdomínios** via DNS ou **virtual hosts** no host alvo
+- [ ] [**Brute-Force de parâmetros**](#enumeracaoo-de-parametros): Encontrar **parâmetros escondidos**.
+- [ ] [**Enumerações específicas**](#enumeracoes-especificas): Executar scans específicos
 
 
-## 1 - Directory enumeration
+
+## Navegue pela aplicacao
+
+Navegue pela aplicação identificando **todos os entry points da aplicação**, sendo eles **formulários**, **variáveis (parâmetros via URL, via post requests...**), etc. Vale considerar que devemos **utilizar um proxy*** para facilitar essa análise inicial
+
+Uma extensão que pode nos ajudar a entender mais a respeito da aplicação é o WappAlyzer
+
+<https://www.wappalyzer.com/apps/>
+
+<https://addons.mozilla.org/pt-BR/firefox/addon/wappalyzer/>
+
+Uma vez identificado todas as possibilidades de endpoints que aceitam inputs, verifique todo o tipo de vulnerabilidade que esteja relacionada ao contexto.
+
+## Procurar por CVEs
+
+Se for uma palicação já conhecida (de mercado) procurar pelo nome e versão da aplicação, tais como SAP, Salesforce, Voting System...
+
+    searchsploit nome_aplicacao 1.0
+
+Uma busca no google é sempre interessante de ser feita...
+
+    firefox http://www.google.com.br/?q=nome_aplicacao%20exploits
+
+## Enumeracao de diretorios
+
+Tente brutar todas as pastas encontradas para encontrar novos **arquivos**e **diretórios**. Tenta achar **arquivos de backup**  dos arquivos encontrados utilizando **extensões nos nomes dos arquivos**. Vide "Com extensões". Faça enumerações iniciais como: **robots**, **sitemap**, **404** error e **SSL/TLS scan** (se HTTPS).
 
 Mais básico e lento
 
@@ -36,7 +61,6 @@ COM EXTENSÕES (MAIS DEMORADO)
     
     gobuster dir --useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -u http://apt.htb -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -x "txt,html,php,asp,aspx,jsp" -k -t 16 -o "tcp_port_protocol_gobuster.txt"
 
-<https://www.invicti.com/s/research/SVNDigger.zip>
 
 **CONSIDERAR AS SEGUINTES EXTENSÕES TAMBÉM**
 
@@ -48,10 +72,19 @@ COM EXTENSÕES (MAIS DEMORADO)
     .docx , .rtf , .xlsx , .pptx , etc.: Office documents
     .bak , .old and other extensions indicative of backup files (for example: ~ for Emacs backup files)
 
+Outras wordlists
 
-## 2 - Front end code review comments and recon
+<https://www.invicti.com/s/research/SVNDigger.zip>
 
-### clone a website
+SSL tests
+
+    sslscan https://<hostname>
+
+## Revisao de codigo do frontend comentarios e reconhecimento
+
+**Baixe o código da aplicação** e faça uma análise do código procurando por **comentários**, requisições ajax para outros endpoints. Procure por outros domínios pelos quais a aplicação consome informações. Procure por links para outros arquivos dentro dos arquivos CSS.
+
+### clone o website
 
     wget --header "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -mk -nH http://domain.com
 
@@ -75,20 +108,12 @@ Com proxy e rodando autenticado.
 
 Depois disso, podemos extrair as URLs dos JSs que foram baixados junto as páginas com o [extract.rb](https://github.com/jobertabma/relative-url-extractor.git)
 
-**Eu baixei esse cara no meu kali e esttou rodando ele com o comando extract.rb**
+**Eu baixei esse cara no meu kali e estou rodando ele com o comando extract.rb**
 
     cat main.e82eb4c5.js | extract.rb
     cat *.js | extract.rb
     cat index.html | extract.rb
     cat *.html | extract.rb
-
-### wappalyzer and whatweb
-
-https://addons.mozilla.org/pt-BR/firefox/addon/wappalyzer/
-
-    whatweb -a 1 https://domain.com.br
-    whatweb -a 3 https://domain.com.br
-    whatweb -a 4 https://domain.com.br
 
 ### httprint
 
@@ -104,10 +129,28 @@ https://addons.mozilla.org/pt-BR/firefox/addon/wappalyzer/
     nc domain.com.br 80
     HEAD / HTTP/1.1
     Host: domain.com.br
-    
-    
+
+## Scanning
+
+Faça um scan de vulnerabilidades na aplicação (**se atentar a detecções e cuidado com testes de negação de serviço. Desabilíte-os, preferencialmente.**)
+
+### whatweb
+
+    whatweb -a 1 https://domain.com.br
+    whatweb -a 3 https://domain.com.br
+    whatweb -a 4 https://domain.com.br
+
+### nikto
+
+    nikto -host http://<hostname> -T x 6 -useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" | tee nikto_output.txt
 
 ### nmap
+
+    nmap -sS --script http* 10.11.1.123
+
+Podemos utilizar vários outros scripts do nmap e podemos encontrá-los com o seguinte comando:
+
+    ls /usr/share/nmap/scripts grep http
 
     sudo nmap -p 80,443 -sV -sS domain.com.br
     sudo nmap -p 80,443 -sS domain.com.br --script http-enum
@@ -145,35 +188,26 @@ Desenvolvi uma ferramenta que automatiza uma parte desse processo. Ela utiliza d
     done
 ```
 
-## 3 - Scanning
+## Enumeracao waf
 
-### whatweb
-
-    whatweb -a 4 https://domain.com.br
-
-### nikto
-
-    nikto -host http://<hostname> -T x 6 -useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" | tee nikto_output.txt
-
-### nmap
-
-    nmap -sS --script http* 10.11.1.123
-
-### waf detection
+Primeiro vamos detectar se tem algum WAF na frente da aplicação.
 
     nmap -Pn --script http-waf-fingerprint domain.com.br --script-args http-waf-fingerprint.intensive=1 -p443,80
     
     nmap -Pn --script http-waf-detect domain.com.br --script-args="http-waf-detect.aggro " -p443,80
-    
+
+Se sim, qual waf?
+
     wafw00f https://<hostname>/
 
-## 4 - searching for subdomains
+## Procurar subdominios
 
 ### fuff
 
     ffuf -c -ic -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -H "Host: FUZZ.<hostname>" -u http://<hostname> -fs xxxx
 
 ### dnsrecon
+
     dnsrecon -d target.com -D wordlist.txt -t brt
     
 
@@ -196,25 +230,23 @@ Attempts to enumerate DNS hostnames by brute force guessing of common subdomains
 
     nmap --script dns-brute --script-args dns-brute.domain=foo.com,dns-brute.threads=6,dns-brute.hostlist=./hostfile.txt,newtargets -sS -p 80
 
-    nmap --script=http-backup-finder mercadobitcoin.com.br -Pn
+    nmap --script=http-backup-finder dominio.com.br -Pn
 
 ### sublist3r
 
-python sublist3r -d \<domain\>
-
-![qownnotes-media-eYJOpJ](../../../media/29314.png)
+    python sublist3r -d dominio.com.br
 
 
-## 5 - Methods enumeration
+## methods enumeration
 
 
-    nmap -p 443 --script http-methods --script-args http-methods.url-path='/index.php' domain.com.br
+    nmap -p 443 --script http-methods --script-args http-methods.url-path='/index.php' <hostname>
 
 Testing PUT method
 
 ```
 PUT /webcrm/test HTTP/2
-Host: maykleads.makesystem.com.br
+Host: dominio.com.br
 Content-Length: 43
 
 <html>
@@ -224,7 +256,7 @@ HTTP PUT Method is Enabled
 # ou
 
 PUT /webcrm/test HTTP/2
-Host: maykleads.makesystem.com.br
+Host: dominio.com.br
 Content-Length: 43
 Content-Type: application/html
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0
@@ -233,6 +265,7 @@ User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115
 HTTP PUT Method is Enabled
 </html>
 ```
+
 ou podemos utilizar o curl também
 
     curl -X PUT http://127.0.0.1:9001/root/.ssh/authorized_keys -d 'content'
@@ -240,12 +273,10 @@ ou podemos utilizar o curl também
     curl -X PUT https://domain.com.br/url/test.html -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0' -d '<html>HTTP PUT Method is Enabled</html>'
     
     ##### Testing with X-HTTP-Method header
-    curl -X PUT https://maykleads.makesystem.com.br/webcrm/test.html -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0' -H 'X-HTTP-Method: PUT' -d '<html>HTTP PUT Method is Enabled</html>'
+    curl -X PUT https://<hostname> -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0' -H 'X-HTTP-Method: PUT' -d '<html>HTTP PUT Method is Enabled</html>'
 
 
-## 6 - Enumeracoes especificas
-
-Look for links to other files inside the CSS files.
+## Enumeracoes especificas
 
 If you find a .git file some information can be extracted
 
@@ -277,7 +308,7 @@ Enumerate all plugins
 
     wpscan --url $url --disable-tls-checks --no-update -e ap --plugins-detection aggressive -f cli-no-color 2>&1 | tee tcp_port_protocol_wpscan_plugins.txt
 
-## 7 - Enumeração de parâmetros
+## Enumeracao de parametros
 
     ffuf -c -ic -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt -u http://apt.htb/clients.html?FUZZ= -fs 12146
     
@@ -287,7 +318,7 @@ Enumeração autenticado:
 
     ffuf -c -ic -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt -b 'Cookie_name1=xxxx; Cookie_name2=xxxx' -H 'Authorization: Bearer xxx' -u https://domain.br/esim-activation-bff/v1/qrcode?FUZZ -p 10 -fs 111,0 -x http://127.0.0.1:8080
     
-## 8 - Others
+## Others
 
 ### 502 Proxy Error
 

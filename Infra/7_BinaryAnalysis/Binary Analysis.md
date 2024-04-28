@@ -17,3 +17,8 @@ Vale considerar que o comportamento do binário muda conforme o usuário informa
 Aqui temos a enumeração das chamadas de sistema que o binário faz.
 
 Esse ponto ainda está em construção.
+
+
+## Ghidra
+
+O ghidra pode ser utilizado para engenharia reversa. No próximo CTF, podemos considerar esse cara.

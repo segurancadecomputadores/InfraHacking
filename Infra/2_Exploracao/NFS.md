@@ -1,8 +1,6 @@
 NFS
 ========================
 
-# Resumo
-
 ## Enumeração
 
  A premissa do NFS é o mesmo do SMB, compartilhar arquivos por meio da rede, acontece que no caso do NFS não é utilizado autenticação e autorização em suas versões 3 e 2, somente um grau de seguranã maior na sua versão 4.
@@ -24,12 +22,17 @@ NFS
 
 ![qownnotes-media-wrgegz](../../media/qownnotes-media-wrgegz.png)
 
-## Exploitation
+## Exploração
 
-Assim que fizermos a enumeração, vamos identificar quais são os IDs pertinenetes aos arquivos lá constados no share via NFS, mas isso só é válido nas versões 2 e 3  do protocolo. A versão 4 já é mais segura! Basta adicionarmos o usuário e o grupo do usuário cujo uid e guid corespondem ao mesmo que foi identificao no momento da enumeração.
+Assim que fizermos a enumeração, vamos identificar quais são os IDs pertinenetes aos arquivos lá constados no share via NFS, mas isso só é válido nas versões 2 e 3  do protocolo. A versão 4 já é mais segura! Basta adicionarmos o usuário e o grupo do usuário cujo uid e guid correspondem ao mesmo que foi identificao no momento da enumeração.
+
 
     sudo adduser --uid 1014 pwn
     sudo addgroup --gid 1014 pwn_group
     sudo usermod -a -G pwn_group pwn
 
     mount.nfs -o vers=3 10.11.1.72:/home /tmp/mount_dir
+    
+Com acesso local na máquina podemos obter o GUID e UID dos arquivos com o seguinte comando:
+
+    ls -aln

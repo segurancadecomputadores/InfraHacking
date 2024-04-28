@@ -31,7 +31,7 @@ Importantíssimo aprendizado:
 
 ## UNSHADOW (Linux cracking hashes)
 
-    unshadow /etc/shadow /etc/shadow > hashes.john
+    unshadow /etc/passwd /etc/shadow > hashes.john
     john --format=sha256crypt -w /usr/share/wordlists/rockyou.txt hashes.txt
 
     john --format=sha256crypt -w /usr/share/wordlists/rockyou.txt shadow

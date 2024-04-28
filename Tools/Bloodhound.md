@@ -1,7 +1,32 @@
 Bloodhound
 ========================
 
-## Enumeracao (com credenciais)
+## Instalacao
+
+    sudo apt update
+    sudo apt install bloodhound
+    sudo neo4j console
+    firefox http://localhost:7474/
+
+Nesse momento é necessário trocar a senha do usuário que vai ser acessado por meio do bloodhound. Nesse primeiro momento inforamos a credencial:
+    
+    neo4j
+    neo4j
+
+Já vai solicitar a troca de senha (somente da primeira vez que iniciamos o script)
+
+Depois basta informar uma senha, (geralmente utilizo bloodhound):
+
+Basta executar:
+
+    bloodhound
+
+Com usuário e senha, respectivamente:
+
+    neo4j
+    bloodhound
+
+## Enumeracao 
 
 Para facilitar a enumeração via ldap, podemos utilizar o bloodhound. Visto que é provável que todas as demais enumerações sejam possíveis por ldapsearch também, porém, os comandos e o protocolo detém uma complexidade um pouco maior. Deixaremos essa pesquisa para o futuro. Focando no bloodhound no momento, vamos considerar algumas opções de enumeração.
 
