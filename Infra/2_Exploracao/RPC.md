@@ -11,7 +11,7 @@ RPC 139/445
     
     enumdomgroups
 
-## Criar usuario vi RPC
+## Criar usuario via RPC
 
     createdomuser hacker
 
@@ -51,8 +51,6 @@ Provide compact results
 
 Null session
 
-Aqui um equívocona questão do rpcclient. Este client utiliza das portas 139 e 445 para comunicação.
-
     rpcclient -U "" -N <hostname>
     srvinfo
     enumdomusers
@@ -64,7 +62,7 @@ Aqui um equívocona questão do rpcclient. Este client utiliza das portas 139 e 
 ## Pass the hash
 
 
-Tem uma forma de realizar o pass the hash via rpcclient. Consideeree o comando:
+Tem uma forma de realizar o pass the hash via rpcclient. Considere o comando:
 
     rpcclient --pw-nt-hash -U domain/user <hostname>
     

