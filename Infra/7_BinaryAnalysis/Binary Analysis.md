@@ -1,6 +1,13 @@
 Binary Analysis
 ========================
 
+## .net
+
+Podemos utilizar o dnSpy para fazer a engenharia reversa deste tipo de binário. Para isso, podemos seguir o seguinte procedimento:
+
+1. Baixar o binário [dnSpy](https://github.com/dnSpy/dnSpy/releases)
+2. Abrir o arquivo a ser analisado com
+
 ## Dynamic
 
 Em meio a alguns laboratórios, notei algumas coisas aqui qeu podem ser interessantes quando se trata de análise de binários. Sendo elas alguumas ferramentas como 

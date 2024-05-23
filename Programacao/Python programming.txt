@@ -33,7 +33,8 @@ print 'string',
 
 ## User input
 
-    
+    HTTP_USER = input("Username: ")
+    HTTP_PASS = getpass("Password: ")
 
 ## environment variables
 

@@ -159,6 +159,11 @@ Exemplos que não são exploráveis:
 
 ![qownnotes-media-vflhHT](../../../media/qownnotes-media-vflhHT.png)
 
+
+Importante ressaltar que quando houver algum binário que vamos precisar fazer algum tipo de engenharia reversa, vamos considerar os seguintes cenários:
+
+[.NET podemos utilizar o dnSpy](../../..)
+
 </details>
 
 <details markdown="1"><summary markdown="1">

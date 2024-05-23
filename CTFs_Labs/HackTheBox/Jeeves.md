@@ -57,7 +57,7 @@ Search explolits
 
 ![qownnotes-media-dqcjOK](../../../media/qownnotes-media-dqcjOK.png)
 
-Aqui um aprendizado interssante que se trata do seguinte... Na enumeração web, utilizar de outras listas de diretórios, pois nesse caso não foi identificado a web managment do jenkins:
+Aqui um aprendizado interssante que se trata do seguinte... Na enumeração web, utilizar de outras listas de diretórios, pois nesse caso não foi identificado a web management do jenkins:
 
 Então, ficou dessa forrma para detectarmos a web console:
 

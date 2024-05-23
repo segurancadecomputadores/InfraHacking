@@ -16,6 +16,7 @@ Aqui já podemos levar em conta que já temos uma credencial válida de domínio
 - [ ] [**Silver Ticket**](#silver-ticket)
 - [ ] [**Adicionar usuário privilegiado**](#adicionar-usuario-privilegiado)
 - [ ] [**Permissionamento de usuário**](#permissionamento-de-usuario)
+- [ ] [**ADCS**](#adcs)
 
 ## Enumeração do domínio com Bloodhound
 
@@ -459,3 +460,8 @@ ou
 Assim que os arquivos necessários estiverem an máquina do atacante, considere o seguinte comando:
 
     impacket-secretsdump local -ntds ntds.dit -system system
+
+
+## ADCS
+
+

@@ -310,6 +310,16 @@ Enumerate all plugins
 
 ## Enumeracao de parametros
 
+Ferramentas:
+
+- ffuf
+- paramspider
+- x8
+- paraminer
+
+
+### ffuf
+
     ffuf -c -ic -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt -u http://apt.htb/clients.html?FUZZ= -fs 12146
     
     ffuf -c -ic -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt -u http://<hostname>/url?FUZZ= -fs xxxx
@@ -317,7 +327,13 @@ Enumerate all plugins
 Enumeração autenticado:
 
     ffuf -c -ic -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt -b 'Cookie_name1=xxxx; Cookie_name2=xxxx' -H 'Authorization: Bearer xxx' -u https://domain.br/esim-activation-bff/v1/qrcode?FUZZ -p 10 -fs 111,0 -x http://127.0.0.1:8080
-    
+
+### paramspider
+
+### x8
+
+
+
 ## Others
 
 ### 502 Proxy Error
