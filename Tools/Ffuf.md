@@ -39,3 +39,28 @@ Parâmetros explicados:
 
 
 ## Comandos Utilizados mais utilizados exploração
+
+Com o comando abaixo, podemos informar numeros de 1-100
+
+```
+seq 1 100 | ffuf -u http://control.htb/view_product.php?id=FUZZ -w -
+```
+
+Utilizando 2 dicionarios
+
+```
+ffuf -u 'http://ffuf.me/cd/param/DIR?PARAM=1' -w /usr/share/seclists/Discovery/Web-Content/common.txt:DIR -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt:PARAM
+```
+
+Concatenando dois payloads:
+
+```
+seq 1 1000 | ffuf -u http://control.htb/view_product.php?id=IDFUZZ -w -:ID -w /usr/share/seclists/Fuzzing/SQLi/quick-SQLi.txt -fs 1339
+```
+
+Fazendo a concatencao de 1 em 1 para evitar overload:
+
+```
+seq 1 1000 | ffuf -u http://control.htb/view_product.php?FUZZ=ID -w -:ID -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt -fs 1339 -x http://127.0.0.1:8080 -mode pitchfork
+```
+

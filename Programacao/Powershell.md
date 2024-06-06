@@ -107,8 +107,7 @@ Getting item codes from marjorie
 
 Results from the following command:
 
-    select-string -Path * -Pattern "\[[a-zA-Z ]*[A-Z]{1,3}\d{3}]" -Allmatches | % { $_.Matche
-s }
+    select-string -Path * -Pattern "\[[a-zA-Z ]*[A-Z]{1,3}\d{3}]" -Allmatches | % { $_.Matches }
 
 
 Groups   : {0}
@@ -143,9 +142,7 @@ Example:
 ## cut in powershell
 source: https://stackoverflow.com/questions/24634022/what-is-an-equivalent-of-nix-cut-command-in-powershell
 	
-	Get-Content $filename | ForEach-Object {
-    $_.split(":")[1]
-	}
+	Get-Content $filename | ForEach-Object { $_.split(":")[1] }
 
 
 cut example for UHG's passwords cracking 

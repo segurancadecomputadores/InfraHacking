@@ -3,28 +3,28 @@ Resumo Enumeracao
 
 **Checklist**
 
-- [x] [**Enumeração de serviços e vulnerabildiades**](#enumeracao%20de%20servicos)
+- [ ] [**Enumeração de serviços e vulnerabildiades**](#enumeracao%20de%20servicos)
 - [ ] [**Enumeração HTTP e HTTPS**](#enumeracao%20http%20e%20https)
-    - [ ] [Navegação manual/Examinar o conteúdo da página (comentários, javascript, links escondidos)](#analisar%20o%20site)
-    - [x] A aplicação possui CVEs?
-    - [x] [Verificar os cabeçalhos de resposta do servidor](#verifica%20cabecalhos)
-    - [x] [Enumerar URLs/arquivos/endpoints/consoles administrativas desconhecidos](#URL%20brute%20force)
-    - [x] [Scanning](#web%20scan%20nikto)
-    - [ ] [Enumeração de usuários e brute force em formulários de login](#enumeracao%20de%20usuario%20e%20brute%20force)
-- [x] [**Enumeração SMB e RPC**](#enumeracao%20smb%20e%20rpc)
-    - [x]  [Null Session](#null%20session)
-    - [x]  [Guest Session](#guest%20session)
-    - [x]  [Acesso de escrita](#acesso%20de%20escrita)
-- [x] [**Enumeração LDAP**](#enumeracao%20ldap)
-- [x] [**Enumeração DNS**](#enumeracao%20dns)
-- [x] [**Enumeração SMTP**](#enumeracao%20smtp)
-- [x] [**Enumeração SNMP**](#enumeracao%20snmp)
-- [x] [**Enumeração NFS**](#enumeracao%20nfs)
-- [x] [**Enumeração FTP**](#enumeracao%20ftp)
-- [x] [**Enumeração Active Directory**](#active%20directory)
-    - [x] [Obter nome domínio](#obter%20nome%20dominio)
-    - [x] [Enumerar usuários](#enumerar%20usuarios)
-    - [x] [**AsRep Roasting**](#asrep%20roasting)
+    - [ ] Navegação manual/Examinar o conteúdo da página (comentários, javascript, links escondidos)
+    - [ ] A aplicação possui CVEs?
+    - [ ] Verificar os cabeçalhos de resposta do servidor
+    - [ ] [Enumerar URLs/arquivos/endpoints/consoles administrativas desconhecidos](#URL%20brute%20force)
+    - [ ] [Scanning](#web-scan-nikto)
+    - [ ] [Enumeração de usuários e brute force em formulários de login](#enumeracao-de-usuario-e-brute-force)
+- [ ] [**Enumeração SMB e RPC**](#enumeracao-smb-e-rpc)
+    - [ ]  [Null Session](#null-session)
+    - [ ]  [Guest Session](#guest-session)
+    - [ ]  [Acesso de escrita](#acesso-de-escrita)
+- [ ] [**Enumeração LDAP**](#enumeracao-ldap)
+- [ ] [**Enumeração DNS**](#enumracao-dns)
+- [ ] [**Enumeração SMTP**](#enumeracao-smtp)
+- [ ] [**Enumeração SNMP**](#enumeracao-snmp)
+- [ ] [**Enumeração NFS**](#enumeracao-nfs)
+- [ ] [**Enumeração FTP**](enumeracao-ftp)
+- [ ] [**Enumeração Active Directory**](#active-directory)
+    - [ ] [Obter nome domínio](#obter-nome-dominio)
+    - [ ] [Enumerar usuários](#enumerar-usuarios)
+    - [ ] [**AsRep Roasting**](#asrep-roasting)
 
 
 ## Enumeracao de servicos
@@ -62,54 +62,15 @@ Scan de vulnerabilidade nmap
 
 ## Enumeracao HTTP e HTTPS
 
-### Analisar o site
-
-Dentro do diretório de ferramentas de web, eu coloquei uma ferramenta que fiz uma pequena alteração para extrair as URLs do site (sem estar autenticado):
-
-```
-/home/acosta/work/Area_de_trabalho/tools/web/2_enumeration/urlExtract -r 4 https://<hostname>
-```
-
-ou
-
-```
-/home/acosta/go/bin/urlExtract -r 4 https://<hostname>
-```
-
-ou somente
-
-```
-urlExtract -r 4 https://<hostname>
-```
-    
-Analisar o codigo do front end
-```
-httrack http://<hostname>
-cd hts-cache
-cat new.txt | cut -f 8
-```
-
-### Verifica cabecalhos
-
-Verificar os headers com curl
-
-```
-curl -v http://<hostname> -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -o /dev/null
-```
-
 ### URL brute force
 
 URL brute force common without extensions
 
-```
-gobuster dir --useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -u http://<hostname> -w /usr/share/seclists/Discovery/Web-Content/common.txt -k -t 16 -o "tcp_port_protocol_s_ext_gobuster.txt"
-```
+    gobuster dir --useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -u http://<hostname> -w /usr/share/seclists/Discovery/Web-Content/common.txt -k -t 16 -o "tcp_port_protocol_s_ext_gobuster.txt"
 
 URL brute force common WITH extensions
 
-```
-feroxbuster -w /usr/share/seclists/Discovery/Web-Content/common.txt -x "txt,html,asp,aspx" -u http://<hostname>
-```
+    feroxbuster -w /usr/share/seclists/Discovery/Web-Content/common.txt -x "txt,html,asp,aspx" -u http://<hostname>
 
 Caso precise filtrar:
 
@@ -127,35 +88,46 @@ URL brute force medium w/ extensions fuff
 
 ### Subdomain enumeration
 
-```
- ffuf -c -ic -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -H "Host: FUZZ.<hostname>" -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -u http://<hostname> -fs xxx
-```
+    ffuf -c -ic -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -H "Host: FUZZ.<hostname>" -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -u http://<hostname> -fs xxx
 
 ### Web scan nikto
 
-```
-nikto -host http://<hostname> -T x 6 -useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" | tee nikto_output.txt
-```
+    nikto -host http://<hostname> -T x 6 -useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" | tee nikto_output.txt
+
+### Extrair links do site
+
+Podemos baixar o conteúdo do site para a máquina e fazer a extração das URLs com os seguintes comandos (lembrando que a ferramenta possui limitações para fazer isso de maneira autenticada e também não funciona proxy para chamadas em HTTPS):
+
+    httrack https://atsserver.acute.local
+    cd hts-cache
+    cat new.txt | cut -f 8
+
+Dentro do diretório de ferramentas de web, eu coloquei uma ferramenta que fiz uma pequena alteração para extrair as URLs do site (sem estar autenticado):
+
+    /home/acosta/work/Area_de_trabalho/tools/web/2_enumeration/urlExtract -r 4 https://<hostname>
+
+ou
+
+    /home/acosta/go/bin/urlExtract -r 4 https://<hostname>
+
+ou somente
+
+    urlExtract -r 4 https://<hostname>
+
 ### sslscan
 
 Dessa forma podemos obter subdomínios identificados em certificados:
 
-```
-sslscan https://<hostname>
-```
+    sslscan https://<hostname>
 
 ### Enumeracao de usuario e brute force
 
 **OBS: Para alterar o User-Agent deve ser informado o cabeçalho via H:.... Segue exemplo abaixo. Vale ressaltar que para o basic authentication essa feature não é suportada e tem que ser feito ajustes via proxy (no burp, por exemplo)**
 
-```
-hydra -l root@locahost -P /usr/share/wordlist/rockyou.txt 10.11.1.39 http-post-form "/otrs/index.pl:H=User-Agent\: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv\:88.0) Gecko/20100101 Firefox/88.0':Action=Login&RequestedURL=&Lang=en&TimeOffset=300&User=root@localhost&Password=^PASS^:Login failed!"
-```
+    hydra -l root@locahost -P /usr/share/wordlist/rockyou.txt 10.11.1.39 http-post-form "/otrs/index.pl:H=User-Agent\: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv\:88.0) Gecko/20100101 Firefox/88.0':Action=Login&RequestedURL=&Lang=en&TimeOffset=300&User=root@localhost&Password=^PASS^:Login failed!"
 
 #### get basic authentication
-```
-hydra -C /usr/share/seclists/Passwords/Default-Credentials/tomcat-betterdefaultpasslist.txt 10.11.1.209 -s 8080 http-get /manager/html
-```
+    hydra -C /usr/share/seclists/Passwords/Default-Credentials/tomcat-betterdefaultpasslist.txt 10.11.1.209 -s 8080 http-get /manager/html
 
 onde -s é a porta
 http-get é o método a ser utilizado
@@ -170,7 +142,7 @@ COM SSL
 
     hydra -l root@locahost -P /usr/share/wordlist/rockyou.txt 10.11.1.39 http-post-form "/otrs/index.pl:Action=Login&RequestedURL=&Lang=en&TimeOffset=300&User=root@localhost&Password=^PASS^:Login failed!"
 
-### Referencia em video
+### Referência em vídeo
 
 ![type:video](https://youtube.com/embed/xuJCzHr6ZWY)
 
@@ -185,7 +157,7 @@ COM SSL
 [Brute force via requisição POST com Burpsuite](https://www.youtube.com/watch?v=xuJCzHr6ZWY&t=1258s)  
 [Brute force via requisição POST com Hydra](https://www.youtube.com/watch?v=xuJCzHr6ZWY&t=1339s)  
 
-## Enumeracao SMB e RPC
+## Enumeração SMB e RPC
 
 
 ### Null session
@@ -231,7 +203,7 @@ Enum4linux
     
     enum4linux -a <hostname>
 
-## Enumeracao LDAP
+## Enumeração LDAP
 
     ldapsearch -x -H ldap://<hostname> -D '' -w '' -b "DC=<domain_name>,DC=<tld>"
 
@@ -239,7 +211,7 @@ Enum4linux
 ldapsearch -x -H ldap://10.10.10.179 -s base
 ```
 
-## Enumeracao DNS
+## Enumeração DNS
 
 Dig
     
@@ -266,7 +238,7 @@ dnsrecon
 [Enumeração automatizada com dnsrecon](https://www.youtube.com/watch?v=hDrpjycOMn0&t=895s)  
 [Enumeração automatizada com dig](https://www.youtube.com/watch?v=hDrpjycOMn0&t=1125s)
 
-## Enumeracao SMTP
+## Enumeração SMTP
 
     nmap -sS -p 25 -n -sV --version-10.11.1.25
 
@@ -296,7 +268,7 @@ Envio de email com conteudo malicioso anexado (attachments). Vide [esta referenc
     sendEmail -t hr@dominio.com.br -f atacante@teste.com.br -a arquivo_malicioso.doc -s 10.10.10.10 
 
 
-## Enumeracao SNMP
+## Enumeração SNMP
 
 Bruteforce de nomes de comunidades
 
@@ -343,7 +315,7 @@ snmpbulkwalk e snmp_process_list.py
 [Enumerando com snmpwalk](https://www.youtube.com/watch?v=cPjZTqfkHbc&t=277s)  
 [Enumerando com snmp-check](https://www.youtube.com/watch?v=cPjZTqfkHbc&t=381s)  
 
-## Enumeracao NFS
+## Enumeração NFS
 
 Enumeração com nmap do NFS
 
@@ -359,7 +331,7 @@ Montando o compartilhamento na máquina
 
 No entanto, no momento de montar o compartilhamento é necessário uma configuração de usuário para exploração desta falha. Vide [esta referência](../2_Exploracao/NFS.md)
 
-## Enumeracao FTP
+## Enumeração FTP
 
     ftp -a <hostname>
 

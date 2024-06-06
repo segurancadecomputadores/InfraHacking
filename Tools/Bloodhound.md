@@ -38,6 +38,16 @@ Para facilitar a enumeração via ldap, podemos utilizar o bloodhound. Visto que
 
 **Localmente**
 
+Com SharpHound
+
+    ./SharpHound.exe -c all -d dominio.local --ldapusername <usuario> --ldappassword <senha>
+
+    ./sh.exe -c all -d dominio.local --ldapusername <usuario> --ldappassword <senha>
+
+ou
+
+    ./sh.exe -c all
+
 
 
 Aqui devemos levar em conta algumas coisas na hora de analisar. As ACLs e as permissões que nossos usuários possuem no domínio. Isto pode ser visto por meio do bloodhound da seguinte maneira:

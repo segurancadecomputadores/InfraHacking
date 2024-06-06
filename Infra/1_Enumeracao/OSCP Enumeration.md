@@ -15,7 +15,7 @@ This cheat sheet should not be considered to be complete and only represents a s
 
 Table of Contents
 
-- [Host Discovery](#hostdiscovery) 
+- [Host Discovery](#host-discovery) 
 - [Port scan](#portscan)
 - [Proxychains](#proxychains)
 - [Autorecon](#autorecon)
@@ -900,7 +900,9 @@ MySQL (3306/tcp)
 
 Version detection + NSE scripts
 
-    nmap -Pn -sV -p 3306 --script="banner,(mysql* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "tcp_3306_mysql_nmap.txt" <hostname>
+```
+nmap -Pn -sV -p 3306 --script="banner,(mysql* or ssl*) and not (brute or broadcast or dos or external or fuzzer)" -oN "tcp_3306_mysql_nmap.txt" <hostname>
+```
 
 MySQL shell
 

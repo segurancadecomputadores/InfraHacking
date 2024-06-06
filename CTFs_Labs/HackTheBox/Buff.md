@@ -1,7 +1,7 @@
 Buff
 ========================
 
-# Enumeration
+## Enumeration
 
     sudo nmap_enum buff.htb | tee nmap_output.txt
     
@@ -20,7 +20,7 @@ Buff
     
 ![qownnotes-media-NGQrEe](../../../media/qownnotes-media-NGQrEe.png)
 
-# Exploitation
+## Exploitation
 
     wget https://www.exploit-db.com/download/48506 -O exploit.py
     python2 exploit.py http://10.10.10.198:8080/
@@ -29,7 +29,7 @@ Buff
 
 ![qownnotes-media-iaWwDr](../../../media/qownnotes-media-iaWwDr.png)
 
-# Privilege Escalation
+## Privilege Escalation
 
 
 Aqui o aprendizado foi interessante, porque a ideia foi encontrar um servico que tivesse uma vulnerabilidade que permite ao atacante realizar a escalacao de privilegio. Os passos abaixo nao funcionaram, mas veja mais abaixo:
