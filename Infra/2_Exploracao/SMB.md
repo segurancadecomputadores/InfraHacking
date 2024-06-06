@@ -55,6 +55,8 @@ Desta forma, basta exxecutar esses dois comandos para ele fazer a busca via dir 
 
 ## Obter hashes de senhas
 
+Quando temos acesso de escrita no compartilhamento (com null session) podemos extrair hashes de senhas de usuários (NetNTLM)
+
 Aqui basicamente é obter hashes NTLMv2 para tentativa de quebrá-los com john ou hashcat.
 
 Fonte:  <https://osandamalith.com/2017/03/24/places-of-interest-in-stealing-netntlm-hashes/>
