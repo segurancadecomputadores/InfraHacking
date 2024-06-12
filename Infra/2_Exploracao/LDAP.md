@@ -18,7 +18,7 @@ Command options explained:
 
 \-x use simple authentication (as opposed to SASL) -H your AD server -D the DN to bind to the directory. In other words, the user you are authenticating with. -W Prompt for the password. The password should match what is in your directory for the the bindn (-D). Mutually exclusive from -w. -b The starting point for the search
 
-## EnumneracaoUsuarios
+## Enumeracao Usuarios
 
 ## Enumeracao (com credenciais)
 
@@ -26,9 +26,15 @@ Para facilitar a enumeração via ldap, podemos utilizar o bloodhound. Visto que
 
 **Remotamente**
 
-    bloodhound-python -u administrator -p Ignite@987 -ns 192.168.1.172 -d ignite.local -c All
+```
+bloodhound-python -u administrator -p Ignite@987 -ns 192.168.1.172 -d ignite.local -c All
+```
+    
     #Outro exemplo
-    bloodhound-python -u mhope -p '4n0therD4y@n0th3r$' -d MEGABANK.LOCAL -v --zip -c All -dc MEGABANK.LOCAL -ns 10.10.10.172
+
+```
+bloodhound-python -u mhope -p '4n0therD4y@n0th3r$' -d MEGABANK.LOCAL -v --zip -c All -dc MEGABANK.LOCAL -ns 10.10.10.172
+```
 
 **Localmente**
 

@@ -277,11 +277,11 @@ enum4linux -a <hostname>
 ## Enumeracao LDAP
 
 ```
-ldapsearch -x -H ldap://<hostname> -D '' -w '' -b "DC=<domain_name>,DC=<tld>"
+ldapsearch -x -H ldap://<hostname> -D '<usuario>@<nome_dominio>' -w '<senha>' -b "DC=<nome_dominio>,DC=<tld>"
 ```
 
 ```
-ldapsearch -x -H ldap://10.10.10.179 -s base
+ldapsearch -x -H ldap://<hostname> -s base
 ```
 
 ## Enumeracao DNS

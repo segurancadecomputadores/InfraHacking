@@ -206,7 +206,7 @@ Primeiro só visualizei os registros que já tinham no servidor;
  
  
  
- Aqui vale ressaltar que quando fui fazer o registro de DNS, notei que ocampo recordDns estava em base 64. Quando decodado, aainda sim não aparecia um IP address, as sim caracteres estranhos. Sendo assim, com uma pesquisa a respeito do assunto, notei que tem um formato específico essa informação conforme dcocumentação da microsoft que pode ser encontrada em:
+ Aqui vale ressaltar que quando fui fazer o registro de DNS, notei que ocampo recordDns estava em base 64. Quando decodado, ainda sim não aparecia um IP address, as sim caracteres estranhos. Sendo assim, com uma pesquisa a respeito do assunto, notei que tem um formato específico essa informação conforme dcocumentação da microsoft que pode ser encontrada em:
  
  https://msdn.microsoft.com/en-us/library/ee898781.aspx
 
@@ -240,7 +240,7 @@ Detalhe que tem uma ferramenta que me auxiliou com relação a colocar um novo r
 
     https://github.com/dirkjanm/krbrelayx.git
 
-É iimportante mencionar que essa ferramenta depende do impacket, que já está instalado na máquina e, nesse caso bastou eu executar o seguinte comando para inserir o registro lá:
+É importante mencionar que essa ferramenta depende do impacket, que já está instalado na máquina e, nesse caso bastou eu executar o seguinte comando para inserir o registro lá:
 
     python dnstool.py -u 'intelligence.htb\Tiffany.Molina' -p NewIntelligenceCorpUser9876 -a add -r webfakedomain.intelligence.htb -d 10.10.14.2 10.10.10.248
  
