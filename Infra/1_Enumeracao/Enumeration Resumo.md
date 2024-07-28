@@ -28,7 +28,7 @@ Resumo Enumeracao
     - [ ] [Enumerar usuários](#enumerar%20usuarios)
     - [ ] [AsRep Roasting](#asrep%20roasting)
 - [ ] [Outros](#outros)
-- [ ] [**Referências**](#referencias)
+- [x] [**Referências**](#referencias)
 
 
 ## Enumeracao de servicos
@@ -612,3 +612,8 @@ sudo ln -s /home/user/Downloads/nmap_enum /usr/bin/nmap_enum
 [urlExtract](https://github.com/eversinc33/urlExtract)
 
 Para instalar, basta seguir as instruções do README.
+
+```
+sudo ln -s /home/acosta/work/Area_de_trabalho/tools/web/2_enumeration/urlExtract /usr/bin/urlExtract
+chmod +x /usr/bin/urlExtract
+```

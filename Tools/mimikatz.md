@@ -68,3 +68,7 @@ mimikatz
 ## List Vault credentials
 
     mimikatz vault::list
+
+## Remove tickets from memory
+
+	mimikatz kerberos::purge

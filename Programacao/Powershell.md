@@ -4,7 +4,9 @@ Powershell
 Executar o seguinte comando para habilitar a utilização de scripts em powershell:
 
 
-    Set-ExecutionPolicy RemoteSigned
+```
+Set-ExecutionPolicy RemoteSigned
+```
 
 https://www.netspi.com/blog/technical/network-penetration-testing/15-ways-to-bypass-the-powershell-execution-policy/
 
