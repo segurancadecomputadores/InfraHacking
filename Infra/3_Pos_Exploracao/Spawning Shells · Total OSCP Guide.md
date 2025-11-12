@@ -20,7 +20,9 @@ Anyways, if you get one of these shells you can upgrade it to a tty-shell using 
     
 ou
 
-    python3 -c 'import pty; pty.spawn("/bin/bash")'
+```
+python3 -c 'import pty; pty.spawn("/bin/bash")'
+```
 
 
     python -c 'import pty; pty.spawn("/bin/bash")'
@@ -33,7 +35,9 @@ ou
     
 ## Script
 
-    script /dev/null -c bash
+```
+script /dev/null -c bash
+```
 <Ctrl + Z>
     
     stty raw -echo; fg

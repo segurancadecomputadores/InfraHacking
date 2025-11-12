@@ -6,15 +6,21 @@ Comando mais utilizados:
 
 ### CTFs/Provas
 
-    feroxbuster -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-big.txt -u http://<hostname> -t 16 --extract-links
+```
+feroxbuster -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-big.txt -u http://<hostname> -t 16 --extract-links
+```
 
 Autenticado (Tem que testar)
 
-    feroxbuster -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-big.txt -u http://<hostname> -t 16 --extract-links -b "Cookies: xxx"
+```
+feroxbuster -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-big.txt -u http://<hostname> -t 16 --extract-links -b "Cookies: xxx"
+```
 
 Debug
 
-    feroxbuster -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-big.txt -u http://<hostname> -t 16 --extract-links -b "Cookies: xxx" --proxy http://127.0.0.1:8080
+```
+feroxbuster -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-big.txt -u http://<hostname> -t 16 --extract-links -b "Cookies: xxx" --proxy http://127.0.0.1:8080
+```
 
 ### Produção
 
@@ -22,7 +28,9 @@ Debug
 
 <https://epi052.github.io/feroxbuster-docs/docs/examples/rate-limit/>
 
-    feroxbuster -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-big.txt -u http://<hostname> -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -t 16 --extract-links --rate-limit 1
+```
+feroxbuster -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-big.txt -u http://<hostname> -H "User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -t 16 --extract-links --rate-limit 1
+```
 
 O -A também seria uma opção para randomizar os agentes utilizados pela ferramenta.
 O -o ou --output para salvar em um arquivo

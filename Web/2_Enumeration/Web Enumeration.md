@@ -11,9 +11,9 @@ Web Enumeration
 - [ ] [**Revisao do código do frontend**](#revisao%20de%20codigo%20do%20frontend%20comentarios%20e%20reconhecimento): Baixe o código da aplicação
 - [ ] [**Scanning**](#scanning): Rodar scan na aplicação
 - [ ] [**Procurar subdomínios**](#procurar%20subdominios): **Procurar por subdomínios** via DNS ou **virtual hosts** no host alvo
-- [ ] [**Brute%20Force de parâmetros**](#enumeracaoo%20de%20parametros): Encontrar **parâmetros escondidos**.
+- [ ] [**Brute Force de parâmetros**](#enumeracao%20de%20parametros): Encontrar **parâmetros escondidos**.
 - [ ] [**Enumerações específicas**](#enumeracoes%20especificas): Executar scans específicos
-
+- [ ] [Possíveis explorações de parâmetros](#possiveis%20exploracoes)
 
 ## Analisar o frontend
 
@@ -69,6 +69,12 @@ Uma busca no google é sempre interessante de ser feita...
 
 Tente brutar todas as pastas encontradas para encontrar novos **arquivos**e **diretórios**. Tenta achar **arquivos de backup**  dos arquivos encontrados utilizando **extensões nos nomes dos arquivos**. Vide "Com extensões". Faça enumerações iniciais como: **robots**, **sitemap**, **404** error e **SSL/TLS scan** (se HTTPS).
 
+Não deixar de considerar o robots.txt
+
+```
+firefox http://<hostname>/robots.txt
+```
+
 Mais básico e lento
 
 ```
@@ -77,19 +83,35 @@ feroxbuster http://<hostname> --extract-links
 
 Somente diretórios básico (sem considerar extensões dos arquivos)
 
-    gobuster dir %20%20useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" %20u http://<hostname> %20w /usr/share/seclists/Discovery/Web%20Content/common.txt %20k %20t 16 %20o "tcp_port_protocol_s_ext_gobuster.txt"
+```
+gobuster dir --useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -u http://<hostname> -w /usr/share/seclists/Discovery/Web-Content/common.txt -k -t 16 -o "tcp_port_protocol_s_ext_gobuster.txt"
+```
 
 Com extensões básico (common.txt)
 
-    gobuster dir %20%20useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" %20u http://<hostname> %20w /usr/share/seclists/Discovery/Web%20Content/common.txt %20x "txt,html,php,asp,aspx,jsp" %20k %20t 16 %20o "tcp_port_protocol_gobuster.txt"
+```
+gobuster dir --useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -u http://<hostname> -w /usr/share/seclists/Discovery/Web-Content/common.txt -x "txt,html,php,asp,aspx,jsp" -k -t 16 -o "tcp_port_protocol_gobuster.txt"
+```
+
+Com feroxbuster
+```
+feroxbuster -A -u http://<hostname> -w /usr/share/seclists/Discovery/Web-Content/common.txt -x "txt,html,php,asp,aspx,jsp"
+```
+
+
+
 
 Somente diretórios (SEM EXTENSÕES)
 
-    gobuster dir %20%20useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" %20u http://<hostname> %20w /usr/share/seclists/Discovery/Web%20Content/directory%20list%202.3%20medium.txt %20k %20t 16 %20o "tcp_port_protocol_gobuster.txt"
+```
+gobuster dir --useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -u http://<hostname> -w /usr/share/seclists/Discovery/Web-Content/directory-list-2.3-medium.txt -k -t 16 -o "tcp_port_protocol_gobuster.txt"
+```
     
 COM EXTENSÕES (MAIS DEMORADO)
     
-    gobuster dir %20%20useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" %20u http://apt.htb %20w /usr/share/seclists/Discovery/Web%20Content/directory%20list%202.3%20medium.txt %20x "txt,html,php,asp,aspx,jsp" %20k %20t 16 %20o "tcp_port_protocol_gobuster.txt"
+```
+gobuster dir %20%20useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" %20u http://apt.htb %20w /usr/share/seclists/Discovery/Web%20Content/directory%20list%202.3%20medium.txt %20x "txt,html,php,asp,aspx,jsp" %20k %20t 16 %20o "tcp_port_protocol_gobuster.txt"
+```
 
 
 **CONSIDERAR AS SEGUINTES EXTENSÕES TAMBÉM**
@@ -118,7 +140,7 @@ sslscan https://<hostname>
 
 ### clone o website
 
-    wget %20%20header "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" %20mk %20nH http://domain.com
+    wget --header "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" -mk -nH http://domain.com
 
     wget %20%20header "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" %20r %20l 8 %20%20no%20check%20certificate https://domain.com 
 
@@ -168,13 +190,15 @@ Faça um scan de vulnerabilidades na aplicação (**se atentar a detecções e c
 
 ### whatweb
 
-    whatweb %20a 1 https://domain.com.br
-    whatweb %20a 3 https://domain.com.br
-    whatweb %20a 4 https://domain.com.br
+    whatweb -a 1 https://domain.com.br
+    whatweb -a 3 https://domain.com.br
+    whatweb -a 4 https://domain.com.br
 
 ### nikto
 
-    nikto %20host http://<hostname> %20T x 6 %20useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" | tee nikto_output.txt
+```
+nikto -host http://<hostname> -T x 6 -useragent "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0" | tee nikto_output.txt
+```
 
 ### nmap
 
@@ -236,7 +260,9 @@ Se sim, qual waf?
 
 ### fuff
 
-    ffuf %20c %20ic %20w /usr/share/seclists/Discovery/DNS/subdomains%20top1million%205000.txt %20H "Host: FUZZ.<hostname>" %20u http://<hostname> %20fs xxxx
+```
+ffuf -c -ic -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-5000.txt -H "Host: FUZZ.<hostname>" -u http://<hostname> -fs xxxx
+```
 
 ### dnsrecon
 
@@ -300,7 +326,9 @@ HTTP PUT Method is Enabled
 
 ou podemos utilizar o curl também
 
-    curl %20X PUT http://127.0.0.1:9001/root/.ssh/authorized_keys %20d 'content'
+```
+curl -X PUT http://127.0.0.1:9001/root/.ssh/authorized_keys -d 'content'
+```
     
     curl %20X PUT https://domain.com.br/url/test.html %20H 'User%20Agent: Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/115.0' %20d '<html>HTTP PUT Method is Enabled</html>'
     
@@ -344,17 +372,21 @@ Enumerate all plugins
 
 Ferramentas:
 
-%20 ffuf
-%20 paramspider
-%20 x8
-%20 paraminer
+- ffuf
+- paramspide
+- x8
+- paraminer
 
 
 ### ffuf
 
-    ffuf %20c %20ic %20w /usr/share/seclists/Discovery/Web%20Content/burp%20parameter%20names.txt %20u http://apt.htb/clients.html?FUZZ= %20fs 12146
+```
+ffuf -c -ic -w /usr/share/seclists/Discovery/Web%20Content/burp%20parameter%20names.txt -u http://apt.htb/clients.html?FUZZ= %20fs 12146
+```
     
-    ffuf %20c %20ic %20w /usr/share/seclists/Discovery/Web%20Content/burp%20parameter%20names.txt %20u http://<hostname>/url?FUZZ= %20fs xxxx
+```
+ffuf -c -ic -w /usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt -u http://<hostname>/url?FUZZ= -fs xxxx
+```
 
 Enumeração autenticado:
 
@@ -364,6 +396,11 @@ Enumeração autenticado:
 
 ### x8
 
+
+## Possiveis exploracoes
+
+- [ ] [**Server side template injection (SSTI)**](../3_Exploitation/Server%20Side%20Template%20Injection%20(SSTI).md)
+- [ ] 
 
 
 ## Others

@@ -13,6 +13,7 @@ Resumo Enumeracao
     - [ ] [Scanning](#web%20scan%20nikto)
     - [ ] [Informações de certificado](#sslscan)
     - [ ] [Enumeração de usuários e brute force em formulários de login](#enumeracao%20de%20usuario%20e%20brute%20force)
+    - [ ] [Enumeração Especializada Web](../../Web/2_Enumeration/Web%20Enumeration.md)
 - [ ] [**Enumeração SMB e RPC**](#enumeracao%20smb%20e%20rpc)
     - [ ]  [Null Session](#null%20session)
     - [ ]  [Guest Session](#guest%20session)
@@ -28,7 +29,7 @@ Resumo Enumeracao
     - [ ] [Enumerar usuários](#enumerar%20usuarios)
     - [ ] [AsRep Roasting](#asrep%20roasting)
 - [ ] [Outros](#outros)
-- [x] [**Referências**](#referencias)
+- [ ] [**Referências**](#referencias)
 
 
 ## Enumeracao de servicos
